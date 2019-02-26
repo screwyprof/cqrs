@@ -1,4 +1,4 @@
-package aggregatestore
+package aggregate
 
 //existingAggID := uuid.New()
 //acc := account.Construct(existingAggID)

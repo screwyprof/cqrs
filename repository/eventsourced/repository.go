@@ -1,4 +1,4 @@
-package aggregatestore
+package eventsourced
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"github.com/screwyprof/cqrs"
 )
 
-type AggregateStore struct {
+type Repository struct {
 	eventStore  cqrs.TransactionalEventStorage
 	eventBus    cqrs.EventPublisher
 	identityMap cqrs.IdentityMap
@@ -14,9 +14,9 @@ type AggregateStore struct {
 	eventProviders map[uuid.UUID]cqrs.EventProvider
 }
 
-func NewAggregateStore(
-	eventStorage cqrs.TransactionalEventStorage, identityMap cqrs.IdentityMap, eventBus cqrs.EventPublisher) *AggregateStore {
-	return &AggregateStore{
+func NewRepository(
+	eventStorage cqrs.TransactionalEventStorage, identityMap cqrs.IdentityMap, eventBus cqrs.EventPublisher) *Repository {
+	return &Repository{
 		eventStore:  eventStorage,
 		eventBus:    eventBus,
 		identityMap: identityMap,
@@ -25,14 +25,20 @@ func NewAggregateStore(
 	}
 }
 
-func (s *AggregateStore) ByID(ID uuid.UUID, aggregateType string) (cqrs.ComplexAggregate, error) {
+func (s *Repository) ByID(ID uuid.UUID, aggregateType string) (cqrs.ComplexAggregate, error) {
+	aggregateRoot := s.identityMap.ByID(ID)
+	if aggregateRoot != nil {
+		s.registerForTracking(aggregateRoot)
+		return aggregateRoot, nil
+	}
+
 	events, err := s.eventStore.LoadEventStream(ID)
 	if err != nil {
 		return nil, err
 	}
 	// maybe return eventstore.AggregateNotFoundError{ID:ID} if no events loaded
 
-	aggregateRoot := cqrs.CreateAggregate(aggregateType, ID)
+	aggregateRoot = cqrs.CreateAggregate(aggregateType, ID)
 	if err := aggregateRoot.LoadFromHistory(events); err != nil {
 		return nil, err
 	}
@@ -42,17 +48,17 @@ func (s *AggregateStore) ByID(ID uuid.UUID, aggregateType string) (cqrs.ComplexA
 	return aggregateRoot, nil
 }
 
-func (s *AggregateStore) Add(aggregateRoot cqrs.ComplexAggregate) {
+func (s *Repository) Add(aggregateRoot cqrs.ComplexAggregate) {
 	s.registerForTracking(aggregateRoot)
 }
 
-func (s *AggregateStore) registerForTracking(aggregateRoot cqrs.ComplexAggregate) {
+func (s *Repository) registerForTracking(aggregateRoot cqrs.ComplexAggregate) {
 	s.eventProviders[aggregateRoot.AggregateID()] = aggregateRoot
 	s.identityMap.Add(aggregateRoot)
 }
 
-func (s *AggregateStore) Commit() error {
-	fmt.Println("AggregateStore: Commit")
+func (s *Repository) Commit() error {
+	fmt.Println("Repository: Commit")
 
 	s.eventStore.BeginTransaction()
 
@@ -81,8 +87,8 @@ func (s *AggregateStore) Commit() error {
 }
 
 /*
-func (s *AggregateStore) Commit() error {
-	fmt.Println("AggregateStore: Commit")
+func (s *Repository) Commit() error {
+	fmt.Println("Repository: Commit")
 	s.eventStore.BeginTransaction()
 
 	for _, eventProvider  := range s.eventProviders {
@@ -102,8 +108,8 @@ func (s *AggregateStore) Commit() error {
 }
 */
 
-func (s *AggregateStore) Rollback() error {
-	fmt.Println("AggregateStore: Rollback")
+func (s *Repository) Rollback() error {
+	fmt.Println("Repository: Rollback")
 	//_bus.Rollback();
 	err := s.eventStore.Rollback()
 	if err != nil {

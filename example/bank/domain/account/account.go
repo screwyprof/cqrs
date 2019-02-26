@@ -6,14 +6,14 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/screwyprof/cqrs"
-	"github.com/screwyprof/cqrs/aggregatestore"
+	"github.com/screwyprof/cqrs/aggregate"
 
 	"github.com/screwyprof/cqrs/example/bank/command"
 	"github.com/screwyprof/cqrs/example/bank/event"
 )
 
 type Account struct {
-	*aggregatestore.Aggregate
+	*aggregate.Aggregate
 
 	number  string
 	balance int64
@@ -21,7 +21,7 @@ type Account struct {
 
 func Construct(ID uuid.UUID) *Account {
 	acc := &Account{}
-	acc.Aggregate = aggregatestore.NewAggregate(ID)
+	acc.Aggregate = aggregate.NewAggregate(ID)
 
 	acc.registerHandlers()
 	acc.registerAppliers()
