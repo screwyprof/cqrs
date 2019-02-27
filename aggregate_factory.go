@@ -1,8 +1,6 @@
 package cqrs
 
 import (
-	"reflect"
-
 	"github.com/google/uuid"
 )
 
@@ -12,7 +10,7 @@ var aggregatefactories = make(map[string]AggregateFactory)
 
 func RegisterAggregate(factory AggregateFactory) {
 	agg := factory(uuid.New())
-	aggregatefactories[reflect.TypeOf(agg).Elem().String()] = factory
+	aggregatefactories[agg.AggregateType()] = factory
 }
 
 func CreateAggregate(aggregateType string, id uuid.UUID) ComplexAggregate {

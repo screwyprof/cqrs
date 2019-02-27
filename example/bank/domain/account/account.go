@@ -21,7 +21,7 @@ type Account struct {
 
 func Construct(ID uuid.UUID) *Account {
 	acc := &Account{}
-	acc.Aggregate = aggregate.NewAggregate(ID)
+	acc.Aggregate = aggregate.NewAggregate(ID, "account.Account")
 
 	acc.registerHandlers()
 	acc.registerAppliers()

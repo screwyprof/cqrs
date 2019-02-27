@@ -18,3 +18,7 @@ func (c DepositMoney) AggregateID() uuid.UUID {
 func (c DepositMoney) AggregateType() string {
 	return "account.Account"
 }
+
+func (c DepositMoney) CommandType() string {
+	return "DepositMoney"
+}

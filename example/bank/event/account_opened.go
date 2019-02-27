@@ -10,7 +10,7 @@ type AccountOpened struct {
 
 func NewAccountOpened(aggID uuid.UUID, number string) AccountOpened {
 	return AccountOpened{
-		DomainEvent: NewDomainEvent(aggID),
+		DomainEvent: NewDomainEvent(aggID, "AccountOpened"),
 		Number:      number,
 	}
 }

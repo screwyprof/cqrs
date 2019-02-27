@@ -11,7 +11,7 @@ type MoneyDeposited struct {
 
 func NewMoneyDeposited(aggID uuid.UUID, amount, balance int64) MoneyDeposited {
 	return MoneyDeposited{
-		DomainEvent: NewDomainEvent(aggID),
+		DomainEvent: NewDomainEvent(aggID, "MoneyDeposited"),
 		Amount:      amount,
 		Balance:     balance,
 	}

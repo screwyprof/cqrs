@@ -2,7 +2,6 @@ package memory
 
 import (
 	"fmt"
-	"reflect"
 	"sync"
 
 	"github.com/google/uuid"
@@ -70,8 +69,7 @@ func (s *EventStore) Commit() error {
 	fmt.Println("DB: Commit")
 	for _, eventStream := range s.eventStreams {
 		for _, event := range eventStream {
-			fmt.Printf("DB: Storing event: %s\n", reflect.TypeOf(event).String())
-
+			fmt.Printf("DB: Storing event: %s\n", event.EventType())
 		}
 	}
 	return nil

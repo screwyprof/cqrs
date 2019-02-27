@@ -5,4 +5,5 @@ import "github.com/google/uuid"
 type Command interface {
 	AggregateID() uuid.UUID
 	AggregateType() string
+	CommandType() string
 }

@@ -2,8 +2,6 @@ package aggregate
 
 import (
 	"fmt"
-	"reflect"
-
 	"github.com/google/uuid"
 
 	"github.com/screwyprof/cqrs"
@@ -13,7 +11,8 @@ type Applier func(event cqrs.DomainEvent)
 type Handler func(command cqrs.Command) error
 
 type Aggregate struct {
-	id uuid.UUID
+	id      uuid.UUID
+	aggType string
 
 	version      uint64
 	eventVersion uint64
@@ -24,9 +23,10 @@ type Aggregate struct {
 	handlers map[string]Handler
 }
 
-func NewAggregate(ID uuid.UUID) *Aggregate {
+func NewAggregate(ID uuid.UUID, aggregateType string) *Aggregate {
 	return &Aggregate{
 		id:       ID,
+		aggType:  aggregateType,
 		appliers: make(map[string]Applier),
 		handlers: make(map[string]Handler),
 	}
@@ -34,6 +34,10 @@ func NewAggregate(ID uuid.UUID) *Aggregate {
 
 func (a *Aggregate) AggregateID() uuid.UUID {
 	return a.id
+}
+
+func (a *Aggregate) AggregateType() string {
+	return a.aggType
 }
 
 func (a *Aggregate) LoadFromHistory(events []cqrs.DomainEvent) error {
@@ -61,12 +65,9 @@ func (a *Aggregate) RegisterHandler(method string, handler Handler) {
 }
 
 func (a *Aggregate) Handle(c cqrs.Command) error {
-	commandType := reflect.TypeOf(c)
-
-	handlerID := commandType.Name()
-	handler, ok := a.handlers[handlerID]
+	handler, ok := a.handlers[c.CommandType()]
 	if !ok {
-		return fmt.Errorf("handler for %s command is not found", handlerID)
+		return fmt.Errorf("handler for %s command is not found", c.CommandType())
 	}
 
 	return handler(c)
@@ -131,9 +132,7 @@ func (a *Aggregate) applyChanges(events ...cqrs.DomainEvent) error {
 }
 
 func (a *Aggregate) applyChange(event cqrs.DomainEvent) error {
-	eventType := reflect.TypeOf(event)
-
-	applierID := "On" + eventType.Name()
+	applierID := "On" + event.EventType()
 	applier, ok := a.appliers[applierID]
 	if !ok {
 		return fmt.Errorf("event handler for %s is not found", applierID)

@@ -18,3 +18,7 @@ func (c OpenAccount) AggregateID() uuid.UUID {
 func (c OpenAccount) AggregateType() string {
 	return "account.Account"
 }
+
+func (c OpenAccount) CommandType() string {
+	return "OpenAccount"
+}
