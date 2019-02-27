@@ -2,12 +2,12 @@ package aggregate
 
 import (
 	"fmt"
+
 	"github.com/google/uuid"
 
 	"github.com/screwyprof/cqrs"
 )
 
-type Applier func(event cqrs.DomainEvent)
 type Handler func(command cqrs.Command) error
 
 type Aggregate struct {
@@ -17,8 +17,8 @@ type Aggregate struct {
 
 	uncommittedChanges []cqrs.DomainEvent
 
-	appliers map[string]Applier
-	handlers map[string]Handler
+	eventApplier *eventApplier
+	handlers     map[string]Handler
 }
 
 func NewAggregate(ID uuid.UUID, aggregateType string) *Aggregate {
@@ -26,8 +26,8 @@ func NewAggregate(ID uuid.UUID, aggregateType string) *Aggregate {
 		id:      ID,
 		aggType: aggregateType,
 
-		appliers: make(map[string]Applier),
-		handlers: make(map[string]Handler),
+		eventApplier: newEventApplier(),
+		handlers:     make(map[string]Handler),
 	}
 }
 
@@ -47,7 +47,7 @@ func (a *Aggregate) LoadFromHistory(events []cqrs.DomainEvent) error {
 	lastEvent := events[len(events)-1]
 	a.version = lastEvent.Version()
 
-	return a.applyEvents(events...)
+	return a.eventApplier.ApplyEvents(events...)
 }
 
 func (a *Aggregate) UncommittedChanges() []cqrs.DomainEvent {
@@ -80,7 +80,7 @@ func (a *Aggregate) Handle(c cqrs.Command) error {
 }
 
 func (a *Aggregate) RegisterApplier(method string, applier Applier) {
-	a.appliers[method] = applier
+	a.eventApplier.RegisterApplier(method, applier)
 }
 
 func (a *Aggregate) Apply(events ...cqrs.DomainEvent) error {
@@ -89,7 +89,7 @@ func (a *Aggregate) Apply(events ...cqrs.DomainEvent) error {
 	}
 
 	a.recordChanges(events...)
-	return a.applyEvents(events...)
+	return a.eventApplier.ApplyEvents(events...)
 }
 
 func (a *Aggregate) recordChanges(events ...cqrs.DomainEvent) {
@@ -99,27 +99,6 @@ func (a *Aggregate) recordChanges(events ...cqrs.DomainEvent) {
 
 		a.uncommittedChanges = append(a.uncommittedChanges, event)
 	}
-}
-
-func (a *Aggregate) applyEvents(events ...cqrs.DomainEvent) error {
-	for _, e := range events {
-		if err := a.applyEvent(e); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (a *Aggregate) applyEvent(event cqrs.DomainEvent) error {
-	applierID := "On" + event.EventType()
-	applier, ok := a.appliers[applierID]
-	if !ok {
-		return fmt.Errorf("event handler for %s is not found", applierID)
-	}
-	applier(event)
-
-	return nil
 }
 
 func (a *Aggregate) nextEventVersion() uint64 {
