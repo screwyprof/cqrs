@@ -8,18 +8,5 @@ jobs:
       - checkout
       - run: go get -v -t -d ./...
       - run: ./tools/generate-fake-tests.sh
-      - run:
-          name: Setup Code Climate test-reporter
-          command: |
-            # download test reporter as a static binary
-                     curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-                     chmod +x ./cc-test-reporter
-      - run:
-          name: Run tests
-          command: |
-            # notify Code Climate of a pending test report using `before-build`
-            ./cc-test-reporter before-build
-             ./tools/coverage.sh
-            # upload test report to Code Climate using `after-build`
-            ./cc-test-reporter after-build --coverage-input-type gocov --exit-code $?
+      - run: ./tools/coverage.sh
       - run: bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN
