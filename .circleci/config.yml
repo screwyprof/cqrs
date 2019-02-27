@@ -7,6 +7,7 @@ jobs:
     steps:
       - checkout
       - run: go get -v -t -d ./...
+      - run: ./tools/generate-fake-tests.sh
       - run:
           name: Setup Code Climate test-reporter
           command: |
