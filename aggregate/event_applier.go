@@ -26,7 +26,7 @@ func (a *eventApplier) RegisterApplier(method string, applier Applier) {
 	a.appliers[method] = applier
 }
 
-func (a *eventApplier) ApplyEvents(events ...cqrs.DomainEvent) error {
+func (a *eventApplier) applyEvents(events ...cqrs.DomainEvent) error {
 	for _, e := range events {
 		if err := a.applyEvent(e); err != nil {
 			return err

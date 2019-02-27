@@ -1,24 +1,19 @@
 package aggregate
 
 import (
-	"fmt"
-
 	"github.com/google/uuid"
 
 	"github.com/screwyprof/cqrs"
 )
 
-type Handler func(command cqrs.Command) error
-
 type Aggregate struct {
 	id      uuid.UUID
 	aggType string
-	version uint64
 
-	uncommittedChanges []cqrs.DomainEvent
-
-	eventApplier *eventApplier
-	handlers     map[string]Handler
+	*eventApplier
+	*commandHandler
+	*changeRecorder
+	*versionProvider
 }
 
 func NewAggregate(ID uuid.UUID, aggregateType string) *Aggregate {
@@ -26,8 +21,10 @@ func NewAggregate(ID uuid.UUID, aggregateType string) *Aggregate {
 		id:      ID,
 		aggType: aggregateType,
 
-		eventApplier: newEventApplier(),
-		handlers:     make(map[string]Handler),
+		eventApplier:    newEventApplier(),
+		commandHandler:  newCommandHandler(),
+		changeRecorder:  newChangeRecorder(),
+		versionProvider: newVersionProvider(),
 	}
 }
 
@@ -45,42 +42,9 @@ func (a *Aggregate) LoadFromHistory(events []cqrs.DomainEvent) error {
 	}
 
 	lastEvent := events[len(events)-1]
-	a.version = lastEvent.Version()
+	a.UpdateVersion(lastEvent.Version())
 
-	return a.eventApplier.ApplyEvents(events...)
-}
-
-func (a *Aggregate) UncommittedChanges() []cqrs.DomainEvent {
-	return a.uncommittedChanges
-}
-
-func (a *Aggregate) MarkChangesAsCommitted() {
-	a.uncommittedChanges = nil
-}
-
-func (a *Aggregate) Version() uint64 {
-	return a.version
-}
-
-func (a *Aggregate) UpdateVersion(version uint64) {
-	a.version = version
-}
-
-func (a *Aggregate) RegisterHandler(method string, handler Handler) {
-	a.handlers[method] = handler
-}
-
-func (a *Aggregate) Handle(c cqrs.Command) error {
-	handler, ok := a.handlers[c.CommandType()]
-	if !ok {
-		return fmt.Errorf("handler for %s command is not found", c.CommandType())
-	}
-
-	return handler(c)
-}
-
-func (a *Aggregate) RegisterApplier(method string, applier Applier) {
-	a.eventApplier.RegisterApplier(method, applier)
+	return a.applyEvents(events...)
 }
 
 func (a *Aggregate) Apply(events ...cqrs.DomainEvent) error {
@@ -89,7 +53,7 @@ func (a *Aggregate) Apply(events ...cqrs.DomainEvent) error {
 	}
 
 	a.recordChanges(events...)
-	return a.eventApplier.ApplyEvents(events...)
+	return a.applyEvents(events...)
 }
 
 func (a *Aggregate) recordChanges(events ...cqrs.DomainEvent) {
@@ -97,10 +61,10 @@ func (a *Aggregate) recordChanges(events ...cqrs.DomainEvent) {
 		event.SetAggregateID(a.id)
 		event.SetVersion(a.nextEventVersion())
 
-		a.uncommittedChanges = append(a.uncommittedChanges, event)
+		a.recordChange(event)
 	}
 }
 
 func (a *Aggregate) nextEventVersion() uint64 {
-	return a.version + uint64(len(a.uncommittedChanges)) + 1
+	return a.Version() + uint64(len(a.UncommittedChanges())) + 1
 }
