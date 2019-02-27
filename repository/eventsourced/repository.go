@@ -64,8 +64,7 @@ func (s *Repository) Commit() error {
 
 	var eventsToPublish []cqrs.DomainEvent
 	for _, eventProvider := range s.eventProviders {
-		err := s.eventStore.Store(
-			eventProvider.AggregateID(), eventProvider.Version(), eventProvider.UncommittedChanges())
+		err := s.eventStore.Store(eventProvider)
 		if err != nil {
 			return err
 		}

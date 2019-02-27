@@ -1,6 +1,8 @@
 package transactional
 
-import "github.com/screwyprof/cqrs"
+import (
+	"github.com/screwyprof/cqrs"
+)
 
 func NewMiddleware(unitOfWork cqrs.UnitOfWork) cqrs.CommandHandlerMiddleware {
 	return cqrs.CommandHandlerMiddleware(func(h cqrs.CommandHandler) cqrs.CommandHandler {
@@ -13,6 +15,10 @@ func NewMiddleware(unitOfWork cqrs.UnitOfWork) cqrs.CommandHandlerMiddleware {
 
 				if commitErr := unitOfWork.Commit(); commitErr != nil {
 					err = unitOfWork.Rollback()
+					if err != nil {
+						return
+					}
+					err = commitErr
 				}
 			}()
 

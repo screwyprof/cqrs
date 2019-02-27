@@ -32,7 +32,8 @@ func (b *EventBus) Publish(events ...cqrs.DomainEvent) {
 }
 
 func (b *EventBus) publish(event cqrs.DomainEvent) {
-	fmt.Printf("EventBus: publishing event %+#v\n", event)
+	fmt.Printf("EventBus: Publishing event: %s@%d of %s %+#v\n",
+		event.EventID(), event.Version(), event.AggregateID().String(), event)
 	for h := range b.handlers {
 		h.Handle(event)
 	}

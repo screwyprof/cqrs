@@ -11,53 +11,64 @@ import (
 
 // EventStore implements EventStore as an in memory structure.
 type EventStore struct {
-	eventStreams   map[uuid.UUID][]cqrs.DomainEvent
-	eventStreamsMu sync.RWMutex
+	committedEventStreams   map[uuid.UUID][]cqrs.DomainEvent
+	committedEventStreamsMu sync.RWMutex
+
+	uncommittedEventStreams   map[uuid.UUID][]cqrs.DomainEvent
+	uncommittedEventStreamsMu sync.RWMutex
 }
 
 func NewEventStore() *EventStore {
 	return &EventStore{
-		eventStreams: make(map[uuid.UUID][]cqrs.DomainEvent),
+		committedEventStreams:   make(map[uuid.UUID][]cqrs.DomainEvent),
+		uncommittedEventStreams: make(map[uuid.UUID][]cqrs.DomainEvent),
 	}
 }
 
-func (s *EventStore) Store(aggregateID uuid.UUID, version uint64, events []cqrs.DomainEvent) error {
+func (s *EventStore) Store(eventProvider cqrs.EventProvider) error {
 	fmt.Println("DB: Store")
-	if len(events) < 1 {
-		return fmt.Errorf("no events given")
-	}
+	//if len(events) < 1 {
+	//	return fmt.Errorf("no events given")
+	//}
 
-	eventStream, err := s.getEventStream(aggregateID)
+	version, err := s.loadEventProviderVersion(eventProvider)
 	if err != nil {
 		return err
 	}
 
-	dbVersion := uint64(len(eventStream))
-
-	currentVersion := dbVersion + uint64(len(events))
-	if currentVersion != version {
-		return fmt.Errorf("EventStream has already been modified (concurrently)")
+	if version != eventProvider.Version() {
+		return fmt.Errorf("EventProvider has already been modified")
 	}
 
-	s.eventStreamsMu.Lock()
-	defer s.eventStreamsMu.Unlock()
+	s.uncommittedEventStreamsMu.Lock()
+	defer s.uncommittedEventStreamsMu.Unlock()
 
-	eventStream = append(eventStream, events...)
-	s.eventStreams[aggregateID] = eventStream
+	s.uncommittedEventStreams[eventProvider.AggregateID()] = eventProvider.UncommittedChanges()
+
+	eventProvider.UpdateVersion(eventProvider.Version() + uint64(len(eventProvider.UncommittedChanges())))
+	// updateEventProviderVersion
 
 	return nil
 }
 
-func (s *EventStore) LoadEventStream(aggregateID uuid.UUID) ([]cqrs.DomainEvent, error) {
-	fmt.Println("DB: LoadEventStream")
-	return s.getEventStream(aggregateID)
+func (s *EventStore) loadEventProviderVersion(eventProvider cqrs.EventProvider) (uint64, error) {
+	eventStream, err := s.loadEventStream(eventProvider.AggregateID())
+	if err != nil {
+		return 0, err
+	}
+	return uint64(len(eventStream)), nil
 }
 
-func (s *EventStore) getEventStream(aggregateID uuid.UUID) ([]cqrs.DomainEvent, error) {
-	s.eventStreamsMu.RLock()
-	defer s.eventStreamsMu.RUnlock()
+func (s *EventStore) LoadEventStream(aggregateID uuid.UUID) ([]cqrs.DomainEvent, error) {
+	fmt.Println("DB: LoadEventStream")
+	return s.loadEventStream(aggregateID)
+}
 
-	eventStream, ok := s.eventStreams[aggregateID]
+func (s *EventStore) loadEventStream(aggregateID uuid.UUID) ([]cqrs.DomainEvent, error) {
+	s.committedEventStreamsMu.RLock()
+	defer s.committedEventStreamsMu.RUnlock()
+
+	eventStream, ok := s.committedEventStreams[aggregateID]
 	if !ok {
 		return nil, nil
 	}
@@ -65,18 +76,50 @@ func (s *EventStore) getEventStream(aggregateID uuid.UUID) ([]cqrs.DomainEvent, 
 	return eventStream, nil
 }
 
+func (s *EventStore) storeEvents(aggregateID uuid.UUID, events ...cqrs.DomainEvent) error {
+	eventStream, err := s.loadEventStream(aggregateID)
+	if err != nil {
+		return err
+	}
+
+	eventStream = append(eventStream, events...)
+
+	s.committedEventStreamsMu.Lock()
+	s.committedEventStreams[aggregateID] = eventStream
+	s.committedEventStreamsMu.Unlock()
+
+	return nil
+}
+
+func (s *EventStore) printEvents(events ...cqrs.DomainEvent) {
+	for _, event := range events {
+		fmt.Printf("DB: Storing event: %s@%d of %s %+#v\n",
+			event.EventID(), event.Version(), event.AggregateID().String(), event)
+	}
+}
+
 func (s *EventStore) Commit() error {
 	fmt.Println("DB: Commit")
-	for _, eventStream := range s.eventStreams {
-		for _, event := range eventStream {
-			fmt.Printf("DB: Storing event: %s\n", event.EventType())
+
+	s.uncommittedEventStreamsMu.RLock()
+	for aggregateID, uncommittedEventStream := range s.uncommittedEventStreams {
+		if err := s.storeEvents(aggregateID, uncommittedEventStream...); err != nil {
+			return err
 		}
+		s.printEvents(uncommittedEventStream...)
 	}
+	s.uncommittedEventStreamsMu.RUnlock()
+
+	s.uncommittedEventStreamsMu.Lock()
+	s.uncommittedEventStreams = make(map[uuid.UUID][]cqrs.DomainEvent)
+	s.uncommittedEventStreamsMu.Unlock()
+
 	return nil
 }
 
 func (s *EventStore) Rollback() error {
 	fmt.Println("DB: Rollback")
+
 	return nil
 }
 

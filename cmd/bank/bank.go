@@ -10,11 +10,12 @@ import (
 	"github.com/screwyprof/cqrs/commandhandler/bus"
 	eventbus "github.com/screwyprof/cqrs/eventbus/memory"
 	eventstore "github.com/screwyprof/cqrs/eventstore/memory"
-	"github.com/screwyprof/cqrs/example/bank/command"
-	"github.com/screwyprof/cqrs/example/bank/domain/account"
 	"github.com/screwyprof/cqrs/identitymap"
 	"github.com/screwyprof/cqrs/middleware/commandhandler/transactional"
 	repository "github.com/screwyprof/cqrs/repository/eventsourced"
+
+	"github.com/screwyprof/cqrs/example/bank/command"
+	"github.com/screwyprof/cqrs/example/bank/domain/account"
 )
 
 func main() {
@@ -38,6 +39,10 @@ func main() {
 
 	err = commandBus.Handle(command.DepositMoney{AggID: accID, Amount: 500})
 	failOnError(err)
+
+	//acc, err := domainRepository.ByID(accID, "account.Account")
+	//failOnError(err)
+	//spew.Dump(acc)
 }
 
 func failOnError(err error) {

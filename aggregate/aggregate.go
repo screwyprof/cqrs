@@ -13,11 +13,9 @@ type Handler func(command cqrs.Command) error
 type Aggregate struct {
 	id      uuid.UUID
 	aggType string
+	version uint64
 
-	version      uint64
-	eventVersion uint64
-
-	appliedEvents []cqrs.DomainEvent
+	uncommittedChanges []cqrs.DomainEvent
 
 	appliers map[string]Applier
 	handlers map[string]Handler
@@ -25,8 +23,9 @@ type Aggregate struct {
 
 func NewAggregate(ID uuid.UUID, aggregateType string) *Aggregate {
 	return &Aggregate{
-		id:       ID,
-		aggType:  aggregateType,
+		id:      ID,
+		aggType: aggregateType,
+
 		appliers: make(map[string]Applier),
 		handlers: make(map[string]Handler),
 	}
@@ -45,19 +44,26 @@ func (a *Aggregate) LoadFromHistory(events []cqrs.DomainEvent) error {
 		return nil
 	}
 
-	return a.applyChanges(events...)
+	lastEvent := events[len(events)-1]
+	a.version = lastEvent.Version()
+
+	return a.applyEvents(events...)
 }
 
 func (a *Aggregate) UncommittedChanges() []cqrs.DomainEvent {
-	return a.appliedEvents
+	return a.uncommittedChanges
 }
 
 func (a *Aggregate) MarkChangesAsCommitted() {
-	a.appliedEvents = nil
+	a.uncommittedChanges = nil
 }
 
 func (a *Aggregate) Version() uint64 {
 	return a.version
+}
+
+func (a *Aggregate) UpdateVersion(version uint64) {
+	a.version = version
 }
 
 func (a *Aggregate) RegisterHandler(method string, handler Handler) {
@@ -82,8 +88,22 @@ func (a *Aggregate) Apply(events ...cqrs.DomainEvent) error {
 		return nil
 	}
 
+	a.recordChanges(events...)
+	return a.applyEvents(events...)
+}
+
+func (a *Aggregate) recordChanges(events ...cqrs.DomainEvent) {
+	for _, event := range events {
+		event.SetAggregateID(a.id)
+		event.SetVersion(a.nextEventVersion())
+
+		a.uncommittedChanges = append(a.uncommittedChanges, event)
+	}
+}
+
+func (a *Aggregate) applyEvents(events ...cqrs.DomainEvent) error {
 	for _, e := range events {
-		if err := a.apply(e); err != nil {
+		if err := a.applyEvent(e); err != nil {
 			return err
 		}
 	}
@@ -91,47 +111,7 @@ func (a *Aggregate) Apply(events ...cqrs.DomainEvent) error {
 	return nil
 }
 
-func (a *Aggregate) apply(event cqrs.DomainEvent) error {
-	event.SetAggregateID(a.id)
-	event.SetVersion(a.nextEventVersion())
-
-	if err := a.applyChange(event); err != nil {
-		return err
-	}
-
-	a.appliedEvents = append(a.appliedEvents, event)
-	a.version++
-
-	return nil
-}
-
-func (a *Aggregate) applyChanges(events ...cqrs.DomainEvent) error {
-	if len(events) < 1 {
-		return nil
-	}
-
-	var version uint64
-	for _, e := range events {
-		if err := a.applyChange(e); err != nil {
-			return err
-		}
-		version++
-	}
-
-	lastEvent := events[len(events)-1]
-
-	a.version = lastEvent.Version()
-	a.eventVersion = a.version
-
-	// maybe it's not necessary
-	if a.version != version {
-		return fmt.Errorf("last event version and calculated version aren't equal")
-	}
-
-	return nil
-}
-
-func (a *Aggregate) applyChange(event cqrs.DomainEvent) error {
+func (a *Aggregate) applyEvent(event cqrs.DomainEvent) error {
 	applierID := "On" + event.EventType()
 	applier, ok := a.appliers[applierID]
 	if !ok {
@@ -143,6 +123,5 @@ func (a *Aggregate) applyChange(event cqrs.DomainEvent) error {
 }
 
 func (a *Aggregate) nextEventVersion() uint64 {
-	a.eventVersion++
-	return a.eventVersion
+	return a.version + uint64(len(a.uncommittedChanges)) + 1
 }
