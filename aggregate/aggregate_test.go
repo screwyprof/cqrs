@@ -1,146 +1,163 @@
-package aggregate
+package aggregate_test
 
 import (
-	"github.com/google/uuid"
-	"github.com/screwyprof/cqrs"
-	"reflect"
 	"testing"
+
+	"github.com/google/uuid"
+
+	"github.com/screwyprof/cqrs"
+	"github.com/screwyprof/cqrs/aggregate"
+	"github.com/screwyprof/cqrs/assert"
 )
 
 func TestNewAggregate(t *testing.T) {
+	// arrange
 	ID := uuid.New()
-	agg := NewAggregate(ID, "TestAggregate")
-	if agg == nil {
-		t.Fatal("there should be an aggregate")
-	}
-	if agg.AggregateType() != "TestAggregate" {
-		t.Error("the aggregate type should be correct: ", agg.AggregateType(), "TestAggregate")
-	}
-	if agg.AggregateID() != ID {
-		t.Error("the aggregate ID should be correct: ", agg.AggregateID(), ID)
-	}
-	if agg.Version() != 0 {
-		t.Error("the version should be 0:", agg.Version())
-	}
+
+	// act
+	agg := aggregate.NewAggregate(ID, TestAggregateType)
+
+	// assert
+	assert.Assert(t, agg != nil, "there should be an aggregate")
 }
 
-//existingAggID := uuid.New()
-//acc := account.Construct(existingAggID)
-//
-//accountOpened := event.NewAccountOpened(existingAggID, "ACC777")
-//accountOpened.SetVersion(1)
-//
-//moneyDeposited := event.NewMoneyDeposited(existingAggID, 100, 100)
-//moneyDeposited.SetVersion(2)
-//
-//moneyDeposited2 := event.NewMoneyDeposited(existingAggID, 50, 150)
-//moneyDeposited2.SetVersion(3)
-//
-//err := acc.LoadFromHistory([]domain.DomainEvent{
-//	accountOpened,
-//	moneyDeposited,
-//	moneyDeposited2,
-//	//event.NewMoneyDeposited(existingAggID, 100, 100),
-//	//event.NewMoneyDeposited(existingAggID, 50, 150),
-//})
-//failOnError(err)
+func TestAggregateAggregateID(t *testing.T) {
+	// arrange
+	ID := uuid.New()
 
-//spew.Dump(acc.AggregateID())
-//spew.Dump(acc.Version())
-//spew.Dump(acc.UncommittedChanges())
+	// act
+	agg := aggregate.NewAggregate(ID, TestAggregateType)
 
-//acc = account.Construct(uuid.New())
-//err = acc.Handle(command.OpenAccount{Number:"ACC777"})
-//failOnError(err)
-//
-//err = acc.Handle(command.DepositMoney{Amount:100})
-//failOnError(err)
+	// assert
+	assert.Assert(t, agg.AggregateID() == ID,
+		"Invalid aggregate ID returned: got %v, expected %v ", agg.AggregateID(), ID)
+}
 
-func TestAggregateEvents(t *testing.T) {
+func TestAggregateAggregateType(t *testing.T) {
+	// arrange
+	ID := uuid.New()
+
+	// act
+	agg := aggregate.NewAggregate(ID, TestAggregateType)
+
+	// assert
+	assert.Assert(t, agg.AggregateType() == TestAggregateType,
+		"Invalid aggregate type returned: got %v, expected %v ", agg.AggregateType(), TestAggregateType)
+}
+
+func TestAggregateLoadFromHistory_ValidEventStreamGiven_AggregateCorrectlyLoadedFromHistory(t *testing.T) {
+	// arrange
+	ID := uuid.New()
+
+	event := NewTestEvent(ID, "event")
+	event.SetVersion(1)
+
+	eventStream := []cqrs.DomainEvent{
+		event,
+	}
+
+	agg := NewTestAggregate(ID)
+
+	// act
+	err := agg.LoadFromHistory(eventStream)
+
+	// assert
+	assert.Ok(t, err)
+	assert.Equals(t, uint64(1), agg.Version())
+	assert.Equals(t, agg.event, eventStream[0])
+}
+
+func TestAggregateLoadFromHistory_EmptyEventStream_NothingChanged(t *testing.T) {
+	// arrange
+	agg := NewTestAggregate(uuid.New())
+
+	// act
+	err := agg.LoadFromHistory(nil)
+
+	// assert
+	assert.Ok(t, err)
+}
+
+func TestAggregateHandle_ValidCommandGiven_EventsApplied(t *testing.T) {
+	// arrange
 	ID := uuid.New()
 	agg := NewTestAggregate(ID)
 
-	event1 := NewTestEvent(ID, "event1")
-	err := agg.Apply(event1)
-	if err != nil {
-		t.Errorf("no error expected, but got: %v", err)
-	}
-	if event1.EventType() != TestEventType {
-		t.Error("the event type should be correct:", event1.EventType())
-	}
-	if !reflect.DeepEqual(event1.Content, "event1") {
-		t.Error("the content should be correct:", event1.Content)
+	c := TestCommand{
+		TestID:  ID,
+		Content: "test_data",
 	}
 
-	if event1.Version() != 1 {
-		t.Error("the version should be 1:", event1.Version())
-	}
-	//if event1.AggregateType() != TestAggregateType {
-	//	t.Error("the aggregate type should be correct:", event1.AggregateType())
-	//}
-	if event1.AggregateID() != ID {
-		t.Error("the aggregate id should be correct:", event1.AggregateID())
-	}
-	//if event1.String() != "TestAggregateEvent@1" {
-	//	t.Error("the string representation should be correct:", event1.String())
-	//}
-	events := agg.UncommittedChanges()
-	if len(events) != 1 {
-		t.Fatal("there should be one event stored:", len(events))
-	}
-	if events[0] != event1 {
-		t.Error("the stored event should be correct:", events[0])
+	// act
+	err := agg.Handle(c)
+	expectedEvent := agg.event.(TestEvent)
+
+	// assert
+	assert.Ok(t, err)
+	assert.Equals(t, ID, expectedEvent.AggregateID())
+	assert.Equals(t, TestEventType, expectedEvent.EventType())
+	assert.Equals(t, "test_data", expectedEvent.Content)
+	assert.Equals(t, uint64(1), expectedEvent.Version())
+}
+
+func TestAggregateHandle_CommandHandlerNotRegistered_ErrorReturned(t *testing.T) {
+	// arrange
+	ID := uuid.New()
+	agg := aggregate.NewAggregate(ID, TestAggregateType)
+
+	c := TestCommand{
+		TestID:  ID,
+		Content: "test_data",
 	}
 
-	event2 := NewTestEvent(ID, "event1")
-	err = agg.Apply(event2)
-	if err != nil {
-		t.Errorf("no error expected, but got: %v", err)
-	}
+	expectedErrorText := "handler for TestCommand command is not found"
 
-	if event2.Version() != 2 {
-		t.Error("the version should be 2:", event2.Version())
-	}
+	// act
+	err := agg.Handle(c)
 
+	// assert
+	assert.Assert(t, err.Error() == expectedErrorText, "expected error (%s), but got %s", expectedErrorText, err)
+}
+
+func TestAggregateApply_NoEventsGiven_NothingChanged(t *testing.T) {
+	// arrange
+	ID := uuid.New()
+	agg := aggregate.NewAggregate(ID, TestAggregateType)
+
+	// act
+	err := agg.Apply(nil)
+
+	// assert
+	assert.Ok(t, err)
+}
+
+func TestAggregateApply_EventHandlerNotRegistered_ErrorReturned(t *testing.T) {
+	// arrange
+	ID := uuid.New()
+	agg := aggregate.NewAggregate(ID, TestAggregateType)
+
+	expectedErrorText := "event handler for OnTestEvent is not found"
+
+	// act
+	err := agg.Apply(NewTestEvent(ID, "event"))
+
+	// assert
+	assert.Assert(t, err.Error() == expectedErrorText, "expected error (%s), but got %s", expectedErrorText, err)
+}
+
+func TestAggregateMarkChangesAsCommitted(t *testing.T) {
+	// arrange
+	ID := uuid.New()
+	agg := NewTestAggregate(ID)
+
+	err := agg.Apply(NewTestEvent(ID, "event"))
+	assert.Ok(t, err)
+
+	// act
 	agg.MarkChangesAsCommitted()
-	events = agg.UncommittedChanges()
-	if len(events) != 0 {
-		t.Error("there should be no events stored:", len(events))
-	}
 
-	event3 := NewTestEvent(ID, "event1")
-	err = agg.Apply(event3)
-	if err != nil {
-		t.Errorf("no error expected, but got: %v", err)
-	}
-
-	if event3.Version() != 1 {
-		t.Error("the version should be 1 after clearing uncommitted events (without applying any):", event3.Version())
-	}
-
-	agg = NewTestAggregate(uuid.New())
-	event1 = NewTestEvent(ID, "event1")
-	err = agg.Apply(event1)
-	if err != nil {
-		t.Errorf("no error expected, but got: %v", err)
-	}
-
-	event2 = NewTestEvent(ID, "event1")
-	err = agg.Apply(event2)
-	if err != nil {
-		t.Errorf("no error expected, but got: %v", err)
-	}
-
-	events = agg.UncommittedChanges()
-	if len(events) != 2 {
-		t.Fatal("there should be 2 events stored:", len(events))
-	}
-	if events[0] != event1 {
-		t.Error("the first stored event should be correct:", events[0])
-	}
-	if events[1] != event2 {
-		t.Error("the second stored event should be correct:", events[0])
-	}
+	// assert
+	assert.Equals(t, 0, len(agg.UncommittedChanges()))
 }
 
 func init() {
@@ -155,14 +172,14 @@ const (
 	TestCommandType   = "TestCommand"
 )
 
-type TestAggregateCommand struct {
+type TestCommand struct {
 	TestID  uuid.UUID
 	Content string
 }
 
-func (t TestAggregateCommand) AggregateID() uuid.UUID { return t.TestID }
-func (t TestAggregateCommand) AggregateType() string  { return TestAggregateType }
-func (t TestAggregateCommand) CommandType() string    { return TestCommandType }
+func (t TestCommand) AggregateID() uuid.UUID { return t.TestID }
+func (t TestCommand) AggregateType() string  { return TestAggregateType }
+func (t TestCommand) CommandType() string    { return TestCommandType }
 
 type DomainEvent struct {
 	ID    uuid.UUID
@@ -218,14 +235,18 @@ func NewTestEvent(aggID uuid.UUID, content string) TestEvent {
 }
 
 type TestAggregate struct {
-	*Aggregate
+	*aggregate.Aggregate
 	event cqrs.DomainEvent
 }
 
 func NewTestAggregate(ID uuid.UUID) *TestAggregate {
 	agg := &TestAggregate{
-		Aggregate: NewAggregate(ID, TestAggregateType),
+		Aggregate: aggregate.NewAggregate(ID, TestAggregateType),
 	}
+
+	agg.RegisterHandler("TestCommand", func(c cqrs.Command) error {
+		return agg.TestCommand(c.(TestCommand))
+	})
 
 	agg.RegisterApplier("OnTestEvent", func(e cqrs.DomainEvent) {
 		agg.onTestEvent(e.(TestEvent))
@@ -234,15 +255,10 @@ func NewTestAggregate(ID uuid.UUID) *TestAggregate {
 	return agg
 }
 
+func (a *TestAggregate) TestCommand(c TestCommand) error {
+	return a.Apply(NewTestEvent(c.TestID, c.Content))
+}
+
 func (a *TestAggregate) onTestEvent(e TestEvent) {
 	a.event = e
 }
-
-//func (a *TestAggregate) Handle(cmd cqrs.Command) error {
-//	return nil
-//}
-
-//func (a *TestAggregate) Apply(event cqrs.DomainEvent) error {
-//	a.event = event
-//	return nil
-//}

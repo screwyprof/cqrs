@@ -2,7 +2,6 @@ package aggregate
 
 import (
 	"github.com/google/uuid"
-
 	"github.com/screwyprof/cqrs"
 )
 
@@ -37,7 +36,7 @@ func (a *Aggregate) AggregateType() string {
 }
 
 func (a *Aggregate) LoadFromHistory(events []cqrs.DomainEvent) error {
-	if len(events) < 1 {
+	if len(events) < 1 || events[0] == nil {
 		return nil
 	}
 
@@ -48,7 +47,7 @@ func (a *Aggregate) LoadFromHistory(events []cqrs.DomainEvent) error {
 }
 
 func (a *Aggregate) Apply(events ...cqrs.DomainEvent) error {
-	if len(events) < 1 {
+	if len(events) < 1 || events[0] == nil {
 		return nil
 	}
 
