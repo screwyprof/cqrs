@@ -4,9 +4,10 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/segmentio/ksuid"
+	"github.com/bxcodec/faker/v3"
 
 	"github.com/screwyprof/cqrs/pkg/cqrs"
+	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
 )
 
 // Factory handles aggregate creation.
@@ -15,6 +16,7 @@ type Factory struct {
 	factoriesMu sync.RWMutex
 }
 
+// NewFactory creates a new instance of Factory.
 func NewFactory() *Factory {
 	return &Factory{
 		factories: make(map[string]cqrs.FactoryFn),
@@ -26,7 +28,7 @@ func (f *Factory) RegisterAggregate(factory cqrs.FactoryFn) {
 	f.factoriesMu.Lock()
 	defer f.factoriesMu.Unlock()
 
-	agg := factory(ksuid.New())
+	agg := factory(mock.StringIdentifier(faker.UUIDHyphenated()))
 	f.factories[agg.AggregateType()] = factory
 }
 

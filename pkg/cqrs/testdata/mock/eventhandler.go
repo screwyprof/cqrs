@@ -16,7 +16,7 @@ type TestEventHandler struct {
 }
 
 func (h *TestEventHandler) OnSomethingHappened(e SomethingHappened) error {
-	h.SomethingHappened = "test"
+	h.SomethingHappened = e.Data
 	return nil
 }
 

@@ -1,2 +1,2 @@
-github.com/segmentio/ksuid v1.0.2 h1:9yBfKyw4ECGTdALaF09Snw3sLJmYIX6AbPJrAy6MrDc=
-github.com/segmentio/ksuid v1.0.2/go.mod h1:BXuJDr2byAiHuQaQtSKoXh1J0YmUDurywOXgB2w+OSU=
+github.com/bxcodec/faker/v3 v3.0.0 h1:ngUvDORKriSpNplR+OdlLwY0bvxJiVevVnh49uEZx/I=
+github.com/bxcodec/faker/v3 v3.0.0/go.mod h1:BLqI1uTe+7fIH/UFHr/oFLjHEvWCtZDf/cnic78+LPs=

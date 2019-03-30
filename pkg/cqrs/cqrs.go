@@ -57,6 +57,7 @@ type Aggregate interface {
 	AggregateType() string
 }
 
+// Versionable used to say that an object can support different versions.
 type Versionable interface {
 	Version() int
 }

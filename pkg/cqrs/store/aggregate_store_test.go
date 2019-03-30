@@ -3,7 +3,7 @@ package store_test
 import (
 	"testing"
 
-	"github.com/segmentio/ksuid"
+	"github.com/bxcodec/faker/v3"
 
 	"github.com/screwyprof/cqrs/pkg/assert"
 	"github.com/screwyprof/cqrs/pkg/cqrs"
@@ -37,7 +37,7 @@ func TestNewStore(t *testing.T) {
 func TestAggregateStoreLoad(t *testing.T) {
 	t.Run("ItFailsIfItCannotLoadEventsForAggregate", func(t *testing.T) {
 		// arrange
-		ID := ksuid.New()
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		s := createAggregateStore(ID, withEventStoreLoadErr(mock.ErrEventStoreCannotLoadEvents))
 
 		// act
@@ -49,7 +49,7 @@ func TestAggregateStoreLoad(t *testing.T) {
 
 	t.Run("ItCannotCreateAggregate", func(t *testing.T) {
 		// arrange
-		ID := ksuid.New()
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		s := createAggregateStore(ID, withEmptyFactory())
 
 		// act
@@ -61,7 +61,7 @@ func TestAggregateStoreLoad(t *testing.T) {
 
 	t.Run("ItFailsIfItCannotApplyEvents", func(t *testing.T) {
 		// arrange
-		ID := ksuid.New()
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		s := createAggregateStore(
 			ID,
 			withLoadedEvents([]cqrs.DomainEvent{mock.SomethingHappened{}}),
@@ -77,7 +77,7 @@ func TestAggregateStoreLoad(t *testing.T) {
 
 	t.Run("ItReturnsAggregate", func(t *testing.T) {
 		// arrange
-		ID := ksuid.New()
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		s := createAggregateStore(ID)
 
 		// act
@@ -92,7 +92,7 @@ func TestAggregateStoreLoad(t *testing.T) {
 func TestAggregateStoreStore(t *testing.T) {
 	t.Run("ItFailsIfItCannotSafeEventsForAggregate", func(t *testing.T) {
 		// arrange
-		ID := ksuid.New()
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		s := createAggregateStore(ID, withEventStoreSaveErr(mock.ErrEventStoreCannotStoreEvents))
 		agg := createAgg(ID)
 
@@ -104,7 +104,7 @@ func TestAggregateStoreStore(t *testing.T) {
 	})
 }
 
-func createAgg(ID ksuid.KSUID) *aggregate.Advanced {
+func createAgg(ID cqrs.Identifier) *aggregate.Advanced {
 	pureAgg := mock.NewTestAggregate(ID)
 
 	commandHandler := aggregate.NewCommandHandler()

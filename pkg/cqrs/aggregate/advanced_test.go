@@ -3,6 +3,8 @@ package aggregate_test
 import (
 	"testing"
 
+	"github.com/bxcodec/faker/v3"
+
 	"github.com/screwyprof/cqrs/pkg/assert"
 	"github.com/screwyprof/cqrs/pkg/cqrs"
 	"github.com/screwyprof/cqrs/pkg/cqrs/aggregate"
@@ -23,7 +25,7 @@ func TestNewBase(t *testing.T) {
 
 	t.Run("ItPanicsIfCommandHandlerIsNotGiven", func(t *testing.T) {
 		factory := func() {
-			aggregate.NewAdvanced(NewTestAggregate(StringIdentifier("Test")), nil, nil)
+			aggregate.NewAdvanced(NewTestAggregate(StringIdentifier(faker.UUIDHyphenated())), nil, nil)
 		}
 		assert.Panic(t, factory)
 	})
@@ -31,7 +33,7 @@ func TestNewBase(t *testing.T) {
 	t.Run("ItPanicsIfEventApplierIsNotGiven", func(t *testing.T) {
 		factory := func() {
 			aggregate.NewAdvanced(
-				NewTestAggregate(StringIdentifier("Test")),
+				NewTestAggregate(StringIdentifier(faker.UUIDHyphenated())),
 				aggregate.NewCommandHandler(),
 				nil,
 			)
@@ -102,7 +104,7 @@ func TestBaseApply(t *testing.T) {
 }
 
 func createTestAggWithDefaultCommandHandlerAndEventApplier() *aggregate.Advanced {
-	ID := StringIdentifier("TestAgg1")
+	ID := StringIdentifier(faker.UUIDHyphenated())
 	pureAgg := NewTestAggregate(ID)
 
 	handler := aggregate.NewCommandHandler()
@@ -115,14 +117,14 @@ func createTestAggWithDefaultCommandHandlerAndEventApplier() *aggregate.Advanced
 }
 
 func createTestAggregateWithCustomCommandHandlerAndEventApplier() *aggregate.Advanced {
-	ID := StringIdentifier("TestAgg1")
+	ID := StringIdentifier(faker.UUIDHyphenated())
 	a := NewTestAggregate(ID)
 
 	return aggregate.NewAdvanced(a, createCommandHandler(a), createEventApplier(a))
 }
 
 func createTestAggWithEmptyCommandHandler() *aggregate.Advanced {
-	ID := StringIdentifier("TestAgg1")
+	ID := StringIdentifier(faker.UUIDHyphenated())
 	pureAgg := NewTestAggregate(ID)
 
 	applier := aggregate.NewEventApplier()
@@ -132,7 +134,7 @@ func createTestAggWithEmptyCommandHandler() *aggregate.Advanced {
 }
 
 func createTestAggWithEmptyEventApplier() *aggregate.Advanced {
-	ID := StringIdentifier("TestAgg1")
+	ID := StringIdentifier(faker.UUIDHyphenated())
 	pureAgg := NewTestAggregate(ID)
 
 	handler := aggregate.NewCommandHandler()
