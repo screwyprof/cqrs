@@ -25,7 +25,12 @@ func NewInMemoryAccountReporter() *InMemoryAccountReporter {
 func (r *InMemoryAccountReporter) AccountDetailsFor(ID report.Identifier) (*report.Account, error) {
 	r.accountMu.RLock()
 	defer r.accountMu.RUnlock()
-	return r.accounts[ID], nil
+
+	if acc, ok := r.accounts[ID]; ok {
+		return acc, nil
+	}
+
+	return nil, ErrAccountNotFound
 }
 
 func (r *InMemoryAccountReporter) Save(account *report.Account) {

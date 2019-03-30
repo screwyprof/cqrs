@@ -23,7 +23,6 @@ func TestNewInMemoryAccountReporter(t *testing.T) {
 
 func TestInMemoryAccountReporter(t *testing.T) {
 	t.Run("ItShouldGetAccountDetailsForAGivenReportID", func(t *testing.T) {
-
 		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		accountReporter := reporting.NewInMemoryAccountReporter()
 
@@ -49,6 +48,14 @@ func TestInMemoryAccountReporter(t *testing.T) {
 
 		assert.Ok(t, err)
 		assert.Equals(t, want, got)
+	})
 
+	t.Run("ItShouldReturnAccountNotFoundErrIfTheGivenAccountIsNotFound", func(t *testing.T) {
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		accountReporter := reporting.NewInMemoryAccountReporter()
+
+		_, err := accountReporter.AccountDetailsFor(ID)
+
+		assert.Equals(t, reporting.ErrAccountNotFound, err)
 	})
 }
