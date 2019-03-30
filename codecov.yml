@@ -1,0 +1,2 @@
+ignore:
+- "pkg/assert"  # ignore folders and all its contents

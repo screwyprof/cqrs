@@ -1,3 +1,3 @@
 module github.com/screwyprof/cqrs
 
-require github.com/google/uuid v1.1.0
+require github.com/segmentio/ksuid v1.0.2
