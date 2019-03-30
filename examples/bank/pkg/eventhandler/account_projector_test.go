@@ -14,4 +14,11 @@ func TestNewAccountDetailsProjector(t *testing.T) {
 		projector := eventhandler.NewAccountDetailsProjector(reporting.NewInMemoryAccountReporter())
 		assert.True(t, projector != nil)
 	})
+
+	t.Run("ItPanicsIfAccountReporterIsNotGiven", func(t *testing.T) {
+		factory := func() {
+			eventhandler.NewAccountDetailsProjector(nil)
+		}
+		assert.Panic(t, factory)
+	})
 }
