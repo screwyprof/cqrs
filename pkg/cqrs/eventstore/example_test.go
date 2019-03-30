@@ -3,14 +3,16 @@ package eventstore_test
 import (
 	"fmt"
 
+	"github.com/bxcodec/faker/v3"
+
 	"github.com/screwyprof/cqrs/pkg/cqrs"
 	"github.com/screwyprof/cqrs/pkg/cqrs/aggregate"
 	"github.com/screwyprof/cqrs/pkg/cqrs/eventstore"
 	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
 )
 
-func ExampleInMemoryEventStoreLoadEventsFor() {
-	ID := mock.StringIdentifier("TestAgg")
+func ExampleInMemoryEventStore_LoadEventsFor() {
+	ID := mock.StringIdentifier(faker.UUIDHyphenated())
 
 	es := eventstore.NewInInMemoryEventStore()
 	_ = es.StoreEventsFor(ID, 0, []cqrs.DomainEvent{mock.SomethingHappened{}})
@@ -19,11 +21,11 @@ func ExampleInMemoryEventStoreLoadEventsFor() {
 	fmt.Printf("%#v", events)
 
 	// Output:
-	// []cqrs.DomainEvent{mock.SomethingHappened{}}
+	// []cqrs.DomainEvent{mock.SomethingHappened{Data:""}}
 }
 
-func ExampleInMemoryEventStoreStoreEventsForConcurrencyError() {
-	ID := mock.StringIdentifier("TestAgg")
+func ExampleInMemoryEventStore_StoreEventsFor() {
+	ID := mock.StringIdentifier(faker.UUIDHyphenated())
 
 	pureAgg := mock.NewTestAggregate(ID)
 

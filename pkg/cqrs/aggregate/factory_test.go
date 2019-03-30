@@ -3,6 +3,8 @@ package aggregate_test
 import (
 	"testing"
 
+	"github.com/bxcodec/faker/v3"
+
 	"github.com/screwyprof/cqrs/pkg/assert"
 	"github.com/screwyprof/cqrs/pkg/cqrs"
 	"github.com/screwyprof/cqrs/pkg/cqrs/aggregate"
@@ -23,7 +25,7 @@ func TestFactoryCreateAggregate(t *testing.T) {
 	t.Run("ItPanicsIfTheAggregateIsNotRegistered", func(t *testing.T) {
 		f := aggregate.NewFactory()
 
-		_, err := f.CreateAggregate("mock.TestAggregate", mock.StringIdentifier("TestAgg"))
+		_, err := f.CreateAggregate(mock.TestAggregateType, mock.StringIdentifier(faker.UUIDHyphenated()))
 
 		assert.Equals(t, mock.ErrAggIsNotRegistered, err)
 	})
@@ -32,7 +34,7 @@ func TestFactoryCreateAggregate(t *testing.T) {
 func TestFactoryRegisterAggregate(t *testing.T) {
 	t.Run("ItRegistersAnAggregateFactory", func(t *testing.T) {
 		// arrange
-		ID := mock.StringIdentifier("TestAgg")
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		agg := mock.NewTestAggregate(ID)
 
 		commandHandler := aggregate.NewCommandHandler()
@@ -53,7 +55,7 @@ func TestFactoryRegisterAggregate(t *testing.T) {
 		f.RegisterAggregate(func(ID cqrs.Identifier) cqrs.AdvancedAggregate {
 			return expected
 		})
-		newAgg, err := f.CreateAggregate("mock.TestAggregate", ID)
+		newAgg, err := f.CreateAggregate(mock.TestAggregateType, ID)
 
 		// assert
 		assert.Ok(t, err)

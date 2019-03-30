@@ -3,6 +3,8 @@ package eventstore_test
 import (
 	"testing"
 
+	"github.com/bxcodec/faker/v3"
+
 	"github.com/screwyprof/cqrs/pkg/assert"
 	"github.com/screwyprof/cqrs/pkg/cqrs/eventstore"
 	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
@@ -23,10 +25,10 @@ func TestNewInInMemoryEventStore(t *testing.T) {
 func TestInMemoryEventStoreLoadEventsFor(t *testing.T) {
 	t.Run("ItLoadsEventsForTheGivenAggregate", func(t *testing.T) {
 		// arrange
-		ID := mock.StringIdentifier("TestAgg")
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		es := eventstore.NewInInMemoryEventStore()
 
-		want := []cqrs.DomainEvent{mock.SomethingHappened{}}
+		want := []cqrs.DomainEvent{mock.SomethingHappened{Data: faker.Word()}}
 
 		err := es.StoreEventsFor(ID, 0, want)
 		assert.Ok(t, err)
@@ -43,7 +45,7 @@ func TestInMemoryEventStoreLoadEventsFor(t *testing.T) {
 func TestInMemoryEventStoreStoreEventsFor(t *testing.T) {
 	t.Run("ItReturnsConcurrencyErrorIfVersionsAreNotTheSame", func(t *testing.T) {
 		// arrange
-		ID := mock.StringIdentifier("TestAgg")
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		es := eventstore.NewInInMemoryEventStore()
 
 		// act

@@ -3,6 +3,8 @@ package eventhandler_test
 import (
 	"testing"
 
+	"github.com/bxcodec/faker/v3"
+
 	"github.com/screwyprof/cqrs/pkg/assert"
 	"github.com/screwyprof/cqrs/pkg/cqrs"
 	"github.com/screwyprof/cqrs/pkg/cqrs/eventhandler"
@@ -26,12 +28,14 @@ func TestEventHandlerHandle(t *testing.T) {
 		s := eventhandler.New()
 		s.RegisterHandlers(eh)
 
+		want := faker.Word()
+
 		// act
-		err := s.Handle(mock.SomethingHappened{})
+		err := s.Handle(mock.SomethingHappened{Data: want})
 
 		// assert
 		assert.Ok(t, err)
-		assert.Equals(t, "test", eh.SomethingHappened)
+		assert.Equals(t, want, eh.SomethingHappened)
 	})
 
 	t.Run("ItFailsIfEventHandlerIsNotRegistered", func(t *testing.T) {
@@ -51,6 +55,7 @@ func TestEventHandlerHandle(t *testing.T) {
 
 		s := eventhandler.New()
 		s.RegisterHandlers(eh)
+
 		// act
 		err := s.Handle(mock.SomethingElseHappened{})
 
@@ -71,8 +76,6 @@ func TestEventHandlerSubscribedTo(t *testing.T) {
 		s.RegisterHandler("OnSomethingElseHappened", func(e cqrs.DomainEvent) error {
 			return eh.OnSomethingElseHappened(e.(mock.SomethingElseHappened))
 		})
-
-		///want := []string{"SomethingHappened", "SomethingElseHappened"}
 
 		// act
 		matcher := s.SubscribedTo()

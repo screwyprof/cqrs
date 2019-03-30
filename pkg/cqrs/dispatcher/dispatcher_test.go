@@ -3,7 +3,7 @@ package dispatcher_test
 import (
 	"testing"
 
-	"github.com/segmentio/ksuid"
+	"github.com/bxcodec/faker/v3"
 
 	"github.com/screwyprof/cqrs/pkg/assert"
 	"github.com/screwyprof/cqrs/pkg/cqrs"
@@ -37,7 +37,7 @@ func TestNewDispatcher(t *testing.T) {
 
 func TestNewDispatcherHandle(t *testing.T) {
 	t.Run("ItFailsIfItCannotLoadAggregate", func(t *testing.T) {
-		ID := ksuid.New()
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		Test(t)(
 			Given(createDispatcher(
 				ID,
@@ -49,7 +49,7 @@ func TestNewDispatcherHandle(t *testing.T) {
 	})
 
 	t.Run("ItFailsIfAggregateCannotHandleTheGivenCommand", func(t *testing.T) {
-		ID := ksuid.New()
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		Test(t)(
 			Given(createDispatcher(
 				ID,
@@ -61,7 +61,7 @@ func TestNewDispatcherHandle(t *testing.T) {
 	})
 
 	t.Run("ItFailsIfItCannotStoreAggregate", func(t *testing.T) {
-		ID := ksuid.New()
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		Test(t)(
 			Given(createDispatcher(
 				ID,
@@ -73,7 +73,7 @@ func TestNewDispatcherHandle(t *testing.T) {
 	})
 
 	t.Run("ItFailsIfItCannotPublishEvents", func(t *testing.T) {
-		ID := ksuid.New()
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		Test(t)(
 			Given(createDispatcher(ID, withPublisherErr(mock.ErrCannotPublishEvents))),
 			When(mock.MakeSomethingHappen{AggID: ID}),
@@ -82,7 +82,7 @@ func TestNewDispatcherHandle(t *testing.T) {
 	})
 
 	t.Run("ItReturnsEvents", func(t *testing.T) {
-		ID := ksuid.New()
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		Test(t)(
 			Given(createDispatcher(ID)),
 			When(mock.MakeSomethingHappen{AggID: ID}),
