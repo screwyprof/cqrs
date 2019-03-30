@@ -28,7 +28,7 @@ func Example() {
 	ID := mock.StringIdentifier(faker.UUIDHyphenated())
 	AccNumber := "ACC777"
 
-	accountReporter := reporting.NewAccountReporter()
+	accountReporter := reporting.NewInMemoryAccountReporter()
 
 	d := createDispatcher(accountReporter)
 
