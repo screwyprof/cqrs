@@ -58,22 +58,15 @@ func TestAccountDetailsProjector(t *testing.T) {
 	t.Run("ItProjectsMoneyDepositedEvent", func(t *testing.T) {
 		// arrange
 		ID := mock.StringIdentifier(faker.UUIDHyphenated())
-		number := faker.Word()
 		amount := int(faker.UnixTime())
 		balance := int(faker.UnixTime())
 
-		want := &report.Account{
-			ID:     ID,
-			Number: number,
-		}
-
-		accountReporter := &accountReporterMock{}
-		accountReporter.On("AccountDetailsFor", ID).Return(want, nil)
-
-		want.Balance = balance
-		want.Ledgers = append(want.Ledgers, report.Ledger{Action: "deposit", Amount: amount})
-
-		accountReporter.On("Save", want)
+		accountReporter := createAccountReporterMock(eh.Ledger{
+			ID:      ID,
+			Action:  "deposit",
+			Amount:  amount,
+			Balance: balance,
+		})
 
 		accountProjector := eventhandler.New()
 		accountProjector.RegisterHandlers(eh.NewAccountDetailsProjector(accountReporter))
@@ -89,22 +82,16 @@ func TestAccountDetailsProjector(t *testing.T) {
 	t.Run("ItReturnsAnErrorWhenItCannotProjectMoneyDepositedEvent", func(t *testing.T) {
 		// arrange
 		ID := mock.StringIdentifier(faker.UUIDHyphenated())
-
-		amount := int(faker.UnixTime())
-		balance := int(faker.UnixTime())
-
 		want := errors.New("an error occurred")
 
-		var accountReport *report.Account
-
-		accountReporter := &accountReporterMock{}
-		accountReporter.On("AccountDetailsFor", ID).Return(accountReport, want)
+		accountReporter := createAccountReporterMockWithError(ID, want)
 
 		accountProjector := eventhandler.New()
 		accountProjector.RegisterHandlers(eh.NewAccountDetailsProjector(accountReporter))
 
 		// act
-		err := accountProjector.Handle(event.MoneyDeposited{ID: ID, Amount: amount, Balance: balance})
+		err := accountProjector.Handle(
+			event.MoneyDeposited{ID: ID, Amount: int(faker.UnixTime()), Balance: int(faker.UnixTime())})
 
 		// assert
 		assert.Equals(t, want, err)
@@ -114,22 +101,15 @@ func TestAccountDetailsProjector(t *testing.T) {
 	t.Run("ItProjectsMoneyWithdrawnEvent", func(t *testing.T) {
 		// arrange
 		ID := mock.StringIdentifier(faker.UUIDHyphenated())
-		number := faker.Word()
 		amount := int(faker.UnixTime())
 		balance := int(faker.UnixTime())
 
-		want := &report.Account{
-			ID:     ID,
-			Number: number,
-		}
-
-		accountReporter := &accountReporterMock{}
-		accountReporter.On("AccountDetailsFor", ID).Return(want, nil)
-
-		want.Balance = balance
-		want.Ledgers = append(want.Ledgers, report.Ledger{Action: "withdraw", Amount: amount})
-
-		accountReporter.On("Save", want)
+		accountReporter := createAccountReporterMock(eh.Ledger{
+			ID:      ID,
+			Action:  "withdraw",
+			Amount:  amount,
+			Balance: balance,
+		})
 
 		accountProjector := eventhandler.New()
 		accountProjector.RegisterHandlers(eh.NewAccountDetailsProjector(accountReporter))
@@ -145,27 +125,44 @@ func TestAccountDetailsProjector(t *testing.T) {
 	t.Run("ItReturnsAnErrorWhenItCannotProjectMoneyWithdrawnEvent", func(t *testing.T) {
 		// arrange
 		ID := mock.StringIdentifier(faker.UUIDHyphenated())
-
-		amount := int(faker.UnixTime())
-		balance := int(faker.UnixTime())
-
 		want := errors.New("an error occurred")
 
-		var accountReport *report.Account
-
-		accountReporter := &accountReporterMock{}
-		accountReporter.On("AccountDetailsFor", ID).Return(accountReport, want)
+		accountReporter := createAccountReporterMockWithError(ID, want)
 
 		accountProjector := eventhandler.New()
 		accountProjector.RegisterHandlers(eh.NewAccountDetailsProjector(accountReporter))
 
 		// act
-		err := accountProjector.Handle(event.MoneyWithdrawn{ID: ID, Amount: amount, Balance: balance})
+		err := accountProjector.Handle(
+			event.MoneyWithdrawn{ID: ID, Amount: int(faker.UnixTime()), Balance: int(faker.UnixTime())})
 
 		// assert
 		assert.Equals(t, want, err)
 		accountReporter.AssertExpectations(t)
 	})
+}
+
+func createAccountReporterMockWithError(ID report.Identifier, want error) *accountReporterMock {
+	var accountReport *report.Account
+	accountReporter := &accountReporterMock{}
+	accountReporter.On("AccountDetailsFor", ID).Return(accountReport, want)
+	return accountReporter
+}
+
+func createAccountReporterMock(l eh.Ledger) *accountReporterMock {
+	number := faker.Word()
+	want := &report.Account{
+		ID:     l.ID,
+		Number: number,
+	}
+	accountReporter := &accountReporterMock{}
+	accountReporter.On("AccountDetailsFor", l.ID).Return(want, nil)
+
+	want.Balance = l.Balance
+	want.Ledgers = append(want.Ledgers, report.Ledger{Action: l.Action, Amount: l.Amount})
+	accountReporter.On("Save", want)
+
+	return accountReporter
 }
 
 type accountReporterMock struct {

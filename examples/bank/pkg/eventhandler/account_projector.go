@@ -30,28 +30,41 @@ func (p *AccountDetailsProjector) OnAccountOpened(e event.AccountOpened) error {
 
 // OnMoneyDeposited handles MoneyDeposited event.
 func (p *AccountDetailsProjector) OnMoneyDeposited(e event.MoneyDeposited) error {
-	acc, err := p.accountReporter.AccountDetailsFor(e.ID)
+	return p.addLedger(Ledger{
+		ID:      e.ID,
+		Action:  "deposit",
+		Balance: e.Balance,
+		Amount:  e.Amount,
+	})
+}
+
+// OnMoneyWithdrawn handles MoneyWithdrawn event.
+func (p *AccountDetailsProjector) OnMoneyWithdrawn(e event.MoneyWithdrawn) error {
+	return p.addLedger(Ledger{
+		ID:      e.ID,
+		Action:  "withdraw",
+		Balance: e.Balance,
+		Amount:  e.Amount,
+	})
+}
+
+func (p *AccountDetailsProjector) addLedger(l Ledger) error {
+	acc, err := p.accountReporter.AccountDetailsFor(l.ID)
 	if err != nil {
 		return err
 	}
 
-	acc.Balance = e.Balance
-	acc.Ledgers = append(acc.Ledgers, report.Ledger{Action: "deposit", Amount: e.Amount})
+	acc.Balance = l.Balance
+	acc.Ledgers = append(acc.Ledgers, report.Ledger{Action: l.Action, Amount: l.Amount})
 
 	p.accountReporter.Save(acc)
 	return nil
 }
 
-// OnMoneyWithdrawn handles MoneyWithdrawn event.
-func (p *AccountDetailsProjector) OnMoneyWithdrawn(e event.MoneyWithdrawn) error {
-	acc, err := p.accountReporter.AccountDetailsFor(e.ID)
-	if err != nil {
-		return err
-	}
-
-	acc.Balance = e.Balance
-	acc.Ledgers = append(acc.Ledgers, report.Ledger{Action: "withdraw", Amount: e.Amount})
-
-	p.accountReporter.Save(acc)
-	return nil
+// Ledger holds ledger info.
+type Ledger struct {
+	ID      report.Identifier
+	Action  string
+	Balance int
+	Amount  int
 }
