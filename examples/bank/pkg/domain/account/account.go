@@ -22,5 +22,5 @@ func (a *Aggregate) AggregateID() domain.Identifier {
 
 // AggregateType return aggregate type.
 func (*Aggregate) AggregateType() string {
-	panic("implement me")
+	return "account.Aggregate"
 }

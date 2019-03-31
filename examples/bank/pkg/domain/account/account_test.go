@@ -32,3 +32,12 @@ func TestAggregateAggregateID(t *testing.T) {
 		assert.Equals(t, ID, agg.AggregateID())
 	})
 }
+
+func TestAggregateAggregateType(t *testing.T) {
+	t.Run("ItReturnsAggregateType", func(t *testing.T) {
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		agg := account.NewAggregate(ID)
+
+		assert.Equals(t, "account.Aggregate", agg.AggregateType())
+	})
+}
