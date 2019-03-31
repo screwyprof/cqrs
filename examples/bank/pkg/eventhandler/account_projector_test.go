@@ -1,13 +1,13 @@
 package eventhandler_test
 
 import (
-	"github.com/screwyprof/cqrs/pkg/cqrs/eventhandler"
 	"testing"
 
 	"github.com/bxcodec/faker/v3"
 	m "github.com/stretchr/testify/mock"
 
 	"github.com/screwyprof/cqrs/pkg/assert"
+	"github.com/screwyprof/cqrs/pkg/cqrs/eventhandler"
 	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
 
 	"github.com/screwyprof/cqrs/examples/bank/internal/reporting"
@@ -54,6 +54,37 @@ func TestAccountDetailsProjector(t *testing.T) {
 		assert.Ok(t, err)
 		accountReporter.AssertCalled(t, "Save", want)
 	})
+
+	t.Run("ItProjectsMoneyDeposited", func(t *testing.T) {
+		// arrange
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		number := faker.Word()
+		amount := int(faker.UnixTime())
+		balance := int(faker.UnixTime())
+
+		want := &report.Account{
+			ID:     ID,
+			Number: number,
+		}
+
+		accountReporter := &accountReporterMock{}
+		accountReporter.On("AccountDetailsFor", ID).Return(want, nil)
+
+		want.Balance = balance
+		want.Ledgers = append(want.Ledgers, report.Ledger{Action: "deposit", Amount: amount})
+
+		accountReporter.On("Save", want)
+
+		accountProjector := eventhandler.New()
+		accountProjector.RegisterHandlers(eh.NewAccountDetailsProjector(accountReporter))
+
+		// act
+		err := accountProjector.Handle(event.MoneyDeposited{ID: ID, Amount: amount, Balance: balance})
+
+		// assert
+		assert.Ok(t, err)
+		accountReporter.AssertExpectations(t)
+	})
 }
 
 type accountReporterMock struct {
@@ -61,7 +92,8 @@ type accountReporterMock struct {
 }
 
 func (r *accountReporterMock) AccountDetailsFor(ID report.Identifier) (*report.Account, error) {
-	panic("implement me")
+	args := r.Called(ID)
+	return args.Get(0).(*report.Account), args.Error(1)
 }
 
 func (r *accountReporterMock) Save(account *report.Account) {
