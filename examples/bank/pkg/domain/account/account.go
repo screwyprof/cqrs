@@ -36,19 +36,31 @@ func (a *Aggregate) OpenAccount(c command.OpenAccount) ([]domain.DomainEvent, er
 	return []domain.DomainEvent{event.AccountOpened{ID: c.ID, Number: c.Number}}, nil
 }
 
-// OnAccountOpened handles AccountOpened event.
-func (a *Aggregate) OnAccountOpened(e event.AccountOpened) {
-	a.number = e.Number
-}
-
-// DepositMoney Credits the account.
+// DepositMoney credits the account.
 func (a *Aggregate) DepositMoney(c command.DepositMoney) ([]domain.DomainEvent, error) {
 	balance := a.balance + c.Amount
 	return []domain.DomainEvent{event.MoneyDeposited{ID: c.ID, Amount: c.Amount, Balance: balance}}, nil
+}
+
+// WithdrawMoney debits the account.
+func (a *Aggregate) WithdrawMoney(c command.WithdrawMoney) ([]domain.DomainEvent, error) {
+	balance := a.balance - c.Amount
+	return []domain.DomainEvent{event.MoneyWithdrawn{ID: c.ID, Amount: c.Amount, Balance: balance}}, nil
+}
+
+// OnAccountOpened handles AccountOpened event.
+func (a *Aggregate) OnAccountOpened(e event.AccountOpened) {
+	a.number = e.Number
 }
 
 // OnMoneyDeposited handles MoneyDeposited event.
 func (a *Aggregate) OnMoneyDeposited(e event.MoneyDeposited) {
 	a.balance = e.Balance
 	//a.Ledgers = append(acc.Ledgers, Ledger{Action: "debit", Amount: e.Amount})
+}
+
+// OnMoneyWithdrawn handles MoneyWithdrawn event.
+func (a *Aggregate) OnMoneyWithdrawn(e event.MoneyWithdrawn) {
+	a.balance = e.Balance
+	//a.Ledgers = append(acc.Ledgers, Ledger{Action: "withdraw", Amount: e.Amount})
 }
