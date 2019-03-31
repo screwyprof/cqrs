@@ -1,9 +1,15 @@
 package account
 
 import (
+	"errors"
+
 	"github.com/screwyprof/cqrs/examples/bank/pkg/command"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/domain"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/event"
+)
+
+var (
+	ErrBalanceIsNotHighEnough = errors.New("balance is not high enogh")
 )
 
 // Aggregate handles operations with an account.
@@ -45,6 +51,9 @@ func (a *Aggregate) DepositMoney(c command.DepositMoney) ([]domain.DomainEvent, 
 // WithdrawMoney debits the account.
 func (a *Aggregate) WithdrawMoney(c command.WithdrawMoney) ([]domain.DomainEvent, error) {
 	balance := a.balance - c.Amount
+	if balance <= 0 {
+		return nil, ErrBalanceIsNotHighEnough
+	}
 	return []domain.DomainEvent{event.MoneyWithdrawn{ID: c.ID, Amount: c.Amount, Balance: balance}}, nil
 }
 

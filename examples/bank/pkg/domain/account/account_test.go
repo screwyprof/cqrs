@@ -93,8 +93,8 @@ func TestAggregate(t *testing.T) {
 		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		number := faker.Word()
 
-		amount := faker.UnixTime()
 		currentBalance := faker.UnixTime()
+		amount := int64(100)
 		newBalance := currentBalance - amount
 
 		Test(t)(
@@ -103,6 +103,18 @@ func TestAggregate(t *testing.T) {
 				event.MoneyDeposited{ID: ID, Amount: currentBalance, Balance: currentBalance}),
 			When(command.WithdrawMoney{ID: ID, Amount: amount}),
 			Then(event.MoneyWithdrawn{ID: ID, Amount: amount, Balance: newBalance}),
+		)
+	})
+
+	t.Run("ItCannotWithdrawMoneyIfBalanceIsNotHighEnough", func(t *testing.T) {
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		number := faker.Word()
+		amount := faker.UnixTime()
+
+		Test(t)(
+			Given(createTestAggregate(ID), event.AccountOpened{ID: ID, Number: number}),
+			When(command.WithdrawMoney{ID: ID, Amount: amount}),
+			ThenFailWith(account.ErrBalanceIsNotHighEnough),
 		)
 	})
 }
