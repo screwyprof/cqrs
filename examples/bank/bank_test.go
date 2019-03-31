@@ -84,7 +84,7 @@ func failCommandOnError(_ []cqrs.DomainEvent, err error) {
 
 func failOnError(err error) {
 	if err != nil {
-		fmt.Printf("an error occured: %v", err)
+		fmt.Printf("an error occurred: %v", err)
 		os.Exit(1)
 	}
 }

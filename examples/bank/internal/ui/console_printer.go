@@ -29,10 +29,10 @@ func NewConsolePrinter(w io.Writer, accountReporter report.GetAccountDetails) *C
 //
 // Sample output:
 // Account #ACC777:
-// # |  Amount | Balance
-// 1 | 1000.00 | 1000.00
-// 2 | -100.00 | 900.00
-// 3 |  500.00 | 1400.00
+// # |   Amount |  Balance
+// 1 |  1000.00 |  1000.00
+// 2 |  -100.00 |   900.00
+// 3 |   500.00 |  1400.00
 func (p *ConsolePrinter) PrintAccountStatement(ID report.Identifier) error {
 	account, err := p.accountReporter.AccountDetailsFor(ID)
 	if err != nil {
