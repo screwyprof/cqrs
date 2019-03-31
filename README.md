@@ -6,8 +6,7 @@
 [![codecov](https://codecov.io/gh/screwyprof/cqrs/branch/master/graph/badge.svg)](https://codecov.io/gh/screwyprof/cqrs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/tag/screwyprof/cqrs.svg)
-[![stability-experimental](https://img.shields.io/badge/stability-experimental-orange.svg)](https://github.com/emersion/stability-badges#experimental)
-
+[![stability-unstable](https://img.shields.io/badge/stability-unstable-yellow.svg)](https://github.com/emersion/stability-badges#unstable)
 
 ## Description
 This is a pet project which was highly inspired by the following projects:
