@@ -18,6 +18,7 @@ func NewAccountDetailsProjector(accountReporter report.AccountReporting) *Accoun
 	return &AccountDetailsProjector{accountReporter: accountReporter}
 }
 
+// OnAccountOpened handles AccountOpened event.
 func (p *AccountDetailsProjector) OnAccountOpened(e event.AccountOpened) error {
 	p.accountReporter.Save(&report.Account{
 		ID:     e.ID,
@@ -27,6 +28,7 @@ func (p *AccountDetailsProjector) OnAccountOpened(e event.AccountOpened) error {
 	return nil
 }
 
+// OnMoneyDeposited handles MoneyDeposited event.
 func (p *AccountDetailsProjector) OnMoneyDeposited(e event.MoneyDeposited) error {
 	acc, err := p.accountReporter.AccountDetailsFor(e.ID)
 	if err != nil {
@@ -40,6 +42,7 @@ func (p *AccountDetailsProjector) OnMoneyDeposited(e event.MoneyDeposited) error
 	return nil
 }
 
+// OnMoneyWithdrawn handles MoneyWithdrawn event.
 func (p *AccountDetailsProjector) OnMoneyWithdrawn(e event.MoneyWithdrawn) error {
 	acc, err := p.accountReporter.AccountDetailsFor(e.ID)
 	if err != nil {

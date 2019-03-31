@@ -141,6 +141,31 @@ func TestAccountDetailsProjector(t *testing.T) {
 		assert.Ok(t, err)
 		accountReporter.AssertExpectations(t)
 	})
+
+	t.Run("ItReturnsAnErrorWhenItCannotProjectMoneyWithdrawnEvent", func(t *testing.T) {
+		// arrange
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+
+		amount := int(faker.UnixTime())
+		balance := int(faker.UnixTime())
+
+		want := errors.New("an error occurred")
+
+		var accountReport *report.Account
+
+		accountReporter := &accountReporterMock{}
+		accountReporter.On("AccountDetailsFor", ID).Return(accountReport, want)
+
+		accountProjector := eventhandler.New()
+		accountProjector.RegisterHandlers(eh.NewAccountDetailsProjector(accountReporter))
+
+		// act
+		err := accountProjector.Handle(event.MoneyWithdrawn{ID: ID, Amount: amount, Balance: balance})
+
+		// assert
+		assert.Equals(t, want, err)
+		accountReporter.AssertExpectations(t)
+	})
 }
 
 type accountReporterMock struct {
