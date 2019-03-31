@@ -85,6 +85,25 @@ func TestConsolePrinter_PrintAccountStatement(t *testing.T) {
 		accountReporter.AssertExpectations(t)
 		assert.Equals(t, want, buf.String())
 	})
+
+	t.Run("ItReturnsAnErrorIfItCannotPrintAccountStatement", func(t *testing.T) {
+		// arrange
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+
+		want := fmt.Errorf("some error occured")
+
+		var account *report.Account
+		accountReporter := &accountReporterMock{}
+		accountReporter.On("AccountDetailsFor", ID).Return(account, want)
+
+		printer := ui.NewConsolePrinter(&bytes.Buffer{}, accountReporter)
+
+		// act
+		err := printer.PrintAccountStatement(ID)
+
+		// assert
+		assert.Equals(t, want, err)
+	})
 }
 
 type accountReporterMock struct {

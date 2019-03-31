@@ -35,6 +35,9 @@ func NewConsolePrinter(w io.Writer, accountReporter report.GetAccountDetails) *C
 // 3 |  500.00 | 1400.00
 func (p *ConsolePrinter) PrintAccountStatement(ID report.Identifier) error {
 	account, err := p.accountReporter.AccountDetailsFor(ID)
+	if err != nil {
+		return err
+	}
 
 	_, _ = fmt.Fprintf(p.w, "Account #%s:\n", account.Number)
 	_, _ = fmt.Fprintf(p.w, "%s |%9s | %8s\n", "#", "Amount", "Balance")
