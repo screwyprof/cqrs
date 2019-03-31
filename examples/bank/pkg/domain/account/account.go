@@ -9,7 +9,8 @@ import (
 )
 
 var (
-	ErrBalanceIsNotHighEnough = errors.New("balance is not high enogh")
+	// ErrBalanceIsNotHighEnough happens when balance is not high enough.
+	ErrBalanceIsNotHighEnough = errors.New("balance is not high enough")
 )
 
 // Aggregate handles operations with an account.
@@ -38,23 +39,23 @@ func (a *Aggregate) AggregateType() string {
 }
 
 // OpenAccount opens a new account with a given number.
-func (a *Aggregate) OpenAccount(c command.OpenAccount) ([]domain.DomainEvent, error) {
-	return []domain.DomainEvent{event.AccountOpened{ID: c.ID, Number: c.Number}}, nil
+func (a *Aggregate) OpenAccount(c command.OpenAccount) ([]domain.Event, error) {
+	return []domain.Event{event.AccountOpened{ID: c.ID, Number: c.Number}}, nil
 }
 
 // DepositMoney credits the account.
-func (a *Aggregate) DepositMoney(c command.DepositMoney) ([]domain.DomainEvent, error) {
+func (a *Aggregate) DepositMoney(c command.DepositMoney) ([]domain.Event, error) {
 	balance := a.balance + c.Amount
-	return []domain.DomainEvent{event.MoneyDeposited{ID: c.ID, Amount: c.Amount, Balance: balance}}, nil
+	return []domain.Event{event.MoneyDeposited{ID: c.ID, Amount: c.Amount, Balance: balance}}, nil
 }
 
 // WithdrawMoney debits the account.
-func (a *Aggregate) WithdrawMoney(c command.WithdrawMoney) ([]domain.DomainEvent, error) {
+func (a *Aggregate) WithdrawMoney(c command.WithdrawMoney) ([]domain.Event, error) {
 	balance := a.balance - c.Amount
 	if balance <= 0 {
 		return nil, ErrBalanceIsNotHighEnough
 	}
-	return []domain.DomainEvent{event.MoneyWithdrawn{ID: c.ID, Amount: c.Amount, Balance: balance}}, nil
+	return []domain.Event{event.MoneyWithdrawn{ID: c.ID, Amount: c.Amount, Balance: balance}}, nil
 }
 
 // OnAccountOpened handles AccountOpened event.
