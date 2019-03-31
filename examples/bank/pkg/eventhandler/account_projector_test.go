@@ -1,6 +1,7 @@
 package eventhandler_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/bxcodec/faker/v3"
@@ -10,7 +11,6 @@ import (
 	"github.com/screwyprof/cqrs/pkg/cqrs/eventhandler"
 	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
 
-	"github.com/screwyprof/cqrs/examples/bank/internal/reporting"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/event"
 	eh "github.com/screwyprof/cqrs/examples/bank/pkg/eventhandler"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/report"
@@ -18,7 +18,7 @@ import (
 
 func TestNewAccountDetailsProjector(t *testing.T) {
 	t.Run("ItCreatesNewInstance", func(t *testing.T) {
-		projector := eh.NewAccountDetailsProjector(reporting.NewInMemoryAccountReporter())
+		projector := eh.NewAccountDetailsProjector(&accountReporterMock{})
 		assert.True(t, projector != nil)
 	})
 
@@ -55,7 +55,7 @@ func TestAccountDetailsProjector(t *testing.T) {
 		accountReporter.AssertCalled(t, "Save", want)
 	})
 
-	t.Run("ItProjectsMoneyDeposited", func(t *testing.T) {
+	t.Run("ItProjectsMoneyDepositedEvent", func(t *testing.T) {
 		// arrange
 		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		number := faker.Word()
@@ -83,6 +83,31 @@ func TestAccountDetailsProjector(t *testing.T) {
 
 		// assert
 		assert.Ok(t, err)
+		accountReporter.AssertExpectations(t)
+	})
+
+	t.Run("ItReturnsAnErrorWhenItCannotProjectMoneyDepositedEvent", func(t *testing.T) {
+		// arrange
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+
+		amount := int(faker.UnixTime())
+		balance := int(faker.UnixTime())
+
+		want := errors.New("an error occurred")
+
+		var accountReport *report.Account
+
+		accountReporter := &accountReporterMock{}
+		accountReporter.On("AccountDetailsFor", ID).Return(accountReport, want)
+
+		accountProjector := eventhandler.New()
+		accountProjector.RegisterHandlers(eh.NewAccountDetailsProjector(accountReporter))
+
+		// act
+		err := accountProjector.Handle(event.MoneyDeposited{ID: ID, Amount: amount, Balance: balance})
+
+		// assert
+		assert.Equals(t, want, err)
 		accountReporter.AssertExpectations(t)
 	})
 }
