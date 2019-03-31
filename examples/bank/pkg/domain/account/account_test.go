@@ -59,7 +59,7 @@ func TestAggregate(t *testing.T) {
 		)
 	})
 
-	t.Run("ItDepositsAnAccount", func(t *testing.T) {
+	t.Run("ItDepositsAnEmptyAccount", func(t *testing.T) {
 		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		number := faker.Word()
 		amount := faker.UnixTime()
@@ -68,6 +68,24 @@ func TestAggregate(t *testing.T) {
 			Given(createTestAggregate(ID), event.AccountOpened{ID: ID, Number: number}),
 			When(command.DepositMoney{ID: ID, Amount: amount}),
 			Then(event.MoneyDeposited{ID: ID, Amount: amount, Balance: amount}),
+		)
+	})
+
+	t.Run("ItDepositsAnAccountWithInitialFunds", func(t *testing.T) {
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		number := faker.Word()
+
+		currentBalance := faker.UnixTime()
+		amount := faker.UnixTime()
+		newBalance := amount + currentBalance
+
+		Test(t)(
+			Given(createTestAggregate(ID),
+				event.AccountOpened{ID: ID, Number: number},
+				event.MoneyDeposited{ID: ID, Amount: currentBalance, Balance: currentBalance},
+			),
+			When(command.DepositMoney{ID: ID, Amount: amount}),
+			Then(event.MoneyDeposited{ID: ID, Amount: amount, Balance: newBalance}),
 		)
 	})
 }
