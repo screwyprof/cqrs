@@ -65,6 +65,6 @@ func (p *AccountDetailsProjector) addLedger(l Ledger) error {
 type Ledger struct {
 	ID      report.Identifier
 	Action  string
-	Balance int
-	Amount  int
+	Balance int64
+	Amount  int64
 }

@@ -58,8 +58,8 @@ func TestAccountDetailsProjector(t *testing.T) {
 	t.Run("ItProjectsMoneyDepositedEvent", func(t *testing.T) {
 		// arrange
 		ID := mock.StringIdentifier(faker.UUIDHyphenated())
-		amount := int(faker.UnixTime())
-		balance := int(faker.UnixTime())
+		amount := faker.UnixTime()
+		balance := faker.UnixTime()
 
 		accountReporter := createAccountReporterMock(eh.Ledger{
 			ID:      ID,
@@ -91,7 +91,7 @@ func TestAccountDetailsProjector(t *testing.T) {
 
 		// act
 		err := accountProjector.Handle(
-			event.MoneyDeposited{ID: ID, Amount: int(faker.UnixTime()), Balance: int(faker.UnixTime())})
+			event.MoneyDeposited{ID: ID, Amount: faker.UnixTime(), Balance: faker.UnixTime()})
 
 		// assert
 		assert.Equals(t, want, err)
@@ -101,8 +101,8 @@ func TestAccountDetailsProjector(t *testing.T) {
 	t.Run("ItProjectsMoneyWithdrawnEvent", func(t *testing.T) {
 		// arrange
 		ID := mock.StringIdentifier(faker.UUIDHyphenated())
-		amount := int(faker.UnixTime())
-		balance := int(faker.UnixTime())
+		amount := faker.UnixTime()
+		balance := faker.UnixTime()
 
 		accountReporter := createAccountReporterMock(eh.Ledger{
 			ID:      ID,
@@ -134,7 +134,7 @@ func TestAccountDetailsProjector(t *testing.T) {
 
 		// act
 		err := accountProjector.Handle(
-			event.MoneyWithdrawn{ID: ID, Amount: int(faker.UnixTime()), Balance: int(faker.UnixTime())})
+			event.MoneyWithdrawn{ID: ID, Amount: faker.UnixTime(), Balance: faker.UnixTime()})
 
 		// assert
 		assert.Equals(t, want, err)

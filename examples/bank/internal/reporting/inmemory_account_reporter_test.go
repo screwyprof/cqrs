@@ -29,7 +29,7 @@ func TestInMemoryAccountReporter(t *testing.T) {
 		want := &report.Account{
 			ID:      ID,
 			Number:  faker.Word(),
-			Balance: int(faker.UnixTime()),
+			Balance: faker.UnixTime(),
 			Ledgers: []report.Ledger{
 				{
 					Action: "debit",

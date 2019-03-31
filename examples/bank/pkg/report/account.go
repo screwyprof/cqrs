@@ -1,9 +1,9 @@
 package report
 
-// Account An Account representation.
+// Account an Account representation.
 type Account struct {
 	ID      Identifier
 	Number  string
-	Balance int
+	Balance int64
 	Ledgers []Ledger
 }

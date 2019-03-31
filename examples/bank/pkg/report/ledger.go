@@ -2,7 +2,7 @@ package report
 
 type Ledger struct {
 	Action string
-	Amount int
+	Amount int64
 }
 
 //func (l Ledger) ToString() string {
