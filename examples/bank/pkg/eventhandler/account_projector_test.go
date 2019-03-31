@@ -1,6 +1,7 @@
 package eventhandler_test
 
 import (
+	"github.com/screwyprof/cqrs/pkg/cqrs/eventhandler"
 	"testing"
 
 	"github.com/bxcodec/faker/v3"
@@ -43,10 +44,11 @@ func TestAccountDetailsProjector(t *testing.T) {
 		accountReporter := &accountReporterMock{}
 		accountReporter.On("Save", want)
 
-		accountProjector := eh.NewAccountDetailsProjector(accountReporter)
+		accountProjector := eventhandler.New()
+		accountProjector.RegisterHandlers(eh.NewAccountDetailsProjector(accountReporter))
 
 		// act
-		err := accountProjector.OnAccountOpened(event.AccountOpened{ID: ID, Number: number})
+		err := accountProjector.Handle(event.AccountOpened{ID: ID, Number: number})
 
 		// assert
 		assert.Ok(t, err)

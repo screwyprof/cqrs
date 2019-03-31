@@ -7,6 +7,6 @@ type AccountOpened struct {
 	Number string
 }
 
-func (e *AccountOpened) EventType() string {
+func (e AccountOpened) EventType() string {
 	return "AccountOpened"
 }
