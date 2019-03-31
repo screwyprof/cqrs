@@ -39,3 +39,16 @@ func (p *AccountDetailsProjector) OnMoneyDeposited(e event.MoneyDeposited) error
 	p.accountReporter.Save(acc)
 	return nil
 }
+
+func (p *AccountDetailsProjector) OnMoneyWithdrawn(e event.MoneyWithdrawn) error {
+	acc, err := p.accountReporter.AccountDetailsFor(e.ID)
+	if err != nil {
+		return err
+	}
+
+	acc.Balance = e.Balance
+	acc.Ledgers = append(acc.Ledgers, report.Ledger{Action: "withdraw", Amount: e.Amount})
+
+	p.accountReporter.Save(acc)
+	return nil
+}

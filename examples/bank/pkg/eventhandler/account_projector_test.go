@@ -110,6 +110,37 @@ func TestAccountDetailsProjector(t *testing.T) {
 		assert.Equals(t, want, err)
 		accountReporter.AssertExpectations(t)
 	})
+
+	t.Run("ItProjectsMoneyWithdrawnEvent", func(t *testing.T) {
+		// arrange
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		number := faker.Word()
+		amount := int(faker.UnixTime())
+		balance := int(faker.UnixTime())
+
+		want := &report.Account{
+			ID:     ID,
+			Number: number,
+		}
+
+		accountReporter := &accountReporterMock{}
+		accountReporter.On("AccountDetailsFor", ID).Return(want, nil)
+
+		want.Balance = balance
+		want.Ledgers = append(want.Ledgers, report.Ledger{Action: "withdraw", Amount: amount})
+
+		accountReporter.On("Save", want)
+
+		accountProjector := eventhandler.New()
+		accountProjector.RegisterHandlers(eh.NewAccountDetailsProjector(accountReporter))
+
+		// act
+		err := accountProjector.Handle(event.MoneyWithdrawn{ID: ID, Amount: amount, Balance: balance})
+
+		// assert
+		assert.Ok(t, err)
+		accountReporter.AssertExpectations(t)
+	})
 }
 
 type accountReporterMock struct {
