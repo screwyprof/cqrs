@@ -7,9 +7,14 @@ import (
 
 	"github.com/screwyprof/cqrs/pkg/assert"
 	"github.com/screwyprof/cqrs/pkg/cqrs"
+	"github.com/screwyprof/cqrs/pkg/cqrs/aggregate"
+	. "github.com/screwyprof/cqrs/pkg/cqrs/aggregate/testdata/fixture"
 	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
 
+	"github.com/screwyprof/cqrs/examples/bank/pkg/command"
+	"github.com/screwyprof/cqrs/examples/bank/pkg/domain"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/domain/account"
+	"github.com/screwyprof/cqrs/examples/bank/pkg/event"
 )
 
 // ensure that game aggregate implements cqrs.Aggregate interface.
@@ -40,4 +45,29 @@ func TestAggregateAggregateType(t *testing.T) {
 
 		assert.Equals(t, "account.Aggregate", agg.AggregateType())
 	})
+}
+
+func TestAggregate(t *testing.T) {
+	t.Run("ItOpensAnAccount", func(t *testing.T) {
+		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		number := faker.Word()
+
+		Test(t)(
+			Given(createTestAggregate(ID)),
+			When(command.OpenAccount{ID: ID, Number: number}),
+			Then(event.AccountOpened{ID: ID, Number: number}),
+		)
+	})
+}
+
+func createTestAggregate(ID domain.Identifier) *aggregate.Advanced {
+	accAgg := account.NewAggregate(ID)
+
+	commandHandler := aggregate.NewCommandHandler()
+	commandHandler.RegisterHandlers(accAgg)
+
+	eventApplier := aggregate.NewEventApplier()
+	eventApplier.RegisterAppliers(accAgg)
+
+	return aggregate.NewAdvanced(accAgg, commandHandler, eventApplier)
 }

@@ -1,10 +1,15 @@
 package account
 
-import "github.com/screwyprof/cqrs/examples/bank/pkg/domain"
+import (
+	"github.com/screwyprof/cqrs/examples/bank/pkg/command"
+	"github.com/screwyprof/cqrs/examples/bank/pkg/domain"
+	"github.com/screwyprof/cqrs/examples/bank/pkg/event"
+)
 
 // Aggregate handles operations with an account.
 type Aggregate struct {
-	id domain.Identifier
+	id     domain.Identifier
+	number string
 }
 
 // NewAggregate creates a new instance of *Aggregate.
@@ -21,6 +26,16 @@ func (a *Aggregate) AggregateID() domain.Identifier {
 }
 
 // AggregateType return aggregate type.
-func (*Aggregate) AggregateType() string {
+func (a *Aggregate) AggregateType() string {
 	return "account.Aggregate"
+}
+
+// OpenAccount opens a new account with a given number.
+func (a *Aggregate) OpenAccount(c command.OpenAccount) ([]domain.DomainEvent, error) {
+	return []domain.DomainEvent{event.AccountOpened{ID: c.ID, Number: c.Number}}, nil
+}
+
+// OnAccountOpened handles AccountOpened event.
+func (a *Aggregate) OnAccountOpened(e event.AccountOpened) {
+	a.number = e.Number
 }
