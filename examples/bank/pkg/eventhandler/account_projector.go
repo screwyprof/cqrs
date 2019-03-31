@@ -42,7 +42,7 @@ func (p *AccountDetailsProjector) OnMoneyDeposited(e event.MoneyDeposited) error
 func (p *AccountDetailsProjector) OnMoneyWithdrawn(e event.MoneyWithdrawn) error {
 	return p.addLedger(Ledger{
 		ID:      e.ID,
-		Action:  "withdraw",
+		Action:  "withdrawal",
 		Balance: e.Balance,
 		Amount:  e.Amount,
 	})
@@ -55,7 +55,7 @@ func (p *AccountDetailsProjector) addLedger(l Ledger) error {
 	}
 
 	acc.Balance = l.Balance
-	acc.Ledgers = append(acc.Ledgers, report.Ledger{Action: l.Action, Amount: l.Amount})
+	acc.Ledgers = append(acc.Ledgers, report.Ledger{Action: l.Action, Amount: l.Amount, Balance: l.Balance})
 
 	p.accountReporter.Save(acc)
 	return nil

@@ -38,14 +38,14 @@ func Example() {
 	failCommandOnError(d.Handle(command.DepositMoney{ID: ID, Amount: 500}))
 
 	printer := ui.NewConsolePrinter(os.Stdout, accountReporter)
-	printer.PrintAccountStatement()
+	failOnError(printer.PrintAccountStatement(ID))
 
 	// Output:
 	// Account #ACC777:
-	// # | Amount  | Balance
-	// 1 | 1000.00 | 1000.00
-	// 2 | -100.00 | 900.00
-	// 3 |  500.00 | 1400.00
+	// # |   Amount |  Balance
+	// 1 |  1000.00 |  1000.00
+	// 2 |  -100.00 |   900.00
+	// 3 |   500.00 |  1400.00
 }
 
 func createDispatcher(accountReporter report.AccountReporting) *dispatcher.Dispatcher {
