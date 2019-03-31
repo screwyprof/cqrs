@@ -16,8 +16,8 @@ func NewAggregate(ID domain.Identifier) *Aggregate {
 }
 
 // AggregateID returns aggregate ID.
-func (*Aggregate) AggregateID() domain.Identifier {
-	panic("implement me")
+func (a *Aggregate) AggregateID() domain.Identifier {
+	return a.id
 }
 
 // AggregateType return aggregate type.
