@@ -19,17 +19,7 @@ var _ cqrs.CommandHandler = (*dispatcher.Dispatcher)(nil)
 func TestNewDispatcher(t *testing.T) {
 	t.Run("ItPanicsIfAggregateStoreIsNotGiven", func(t *testing.T) {
 		factory := func() {
-			dispatcher.NewDispatcher(nil, nil)
-		}
-		assert.Panic(t, factory)
-	})
-
-	t.Run("ItPanicsIfEventPublisherIsNotGiven", func(t *testing.T) {
-		factory := func() {
-			dispatcher.NewDispatcher(
-				createAggregateStoreMock(nil, nil, nil),
-				nil,
-			)
+			dispatcher.NewDispatcher(nil)
 		}
 		assert.Panic(t, factory)
 	})
@@ -69,15 +59,6 @@ func TestNewDispatcherHandle(t *testing.T) {
 			)),
 			When(mock.MakeSomethingHappen{AggID: ID}),
 			ThenFailWith(mock.ErrAggregateStoreCannotStoreAggregate),
-		)
-	})
-
-	t.Run("ItFailsIfItCannotPublishEvents", func(t *testing.T) {
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
-		Test(t)(
-			Given(createDispatcher(ID, withPublisherErr(mock.ErrCannotPublishEvents))),
-			When(mock.MakeSomethingHappen{AggID: ID}),
-			ThenFailWith(mock.ErrCannotPublishEvents),
 		)
 	})
 
@@ -148,7 +129,6 @@ func createDispatcher(ID cqrs.Identifier, opts ...option) *dispatcher.Dispatcher
 
 	return dispatcher.NewDispatcher(
 		createAggregateStoreMock(agg, config.loadErr, config.storeErr),
-		createEventPublisherMock(config.publisherErr),
 	)
 }
 
@@ -162,13 +142,4 @@ func createAggregateStoreMock(want cqrs.AdvancedAggregate, loadErr error, storeE
 		},
 	}
 	return eventStore
-}
-
-func createEventPublisherMock(err error) *mock.EventPublisherMock {
-	eventPublisher := &mock.EventPublisherMock{
-		Publisher: func(e ...cqrs.DomainEvent) error {
-			return err
-		},
-	}
-	return eventPublisher
 }
