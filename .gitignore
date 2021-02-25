@@ -2,3 +2,4 @@ fake_for_correct_coverage_test.go
 *.out
 coverage.txt
 .idea/
+tools/bin/
