@@ -1,0 +1,49 @@
+run:
+  deadline: 5m
+  timeout: 2m
+  tests: true
+  # default is true. Enables skipping of directories:
+  #   vendor$, third_party$, testdata$, examples$, Godeps$, builtin$
+  skip-dirs-use-default: true
+  #skip-files:
+  #  - core/genesis_alloc.go
+
+modules-download-mode: readonly
+
+linters:
+  enable:
+    - errcheck
+    - goconst
+    - gofmt
+    - golint
+    - interfacer
+    - deadcode
+    - govet
+    - structcheck
+    - misspell
+    - megacheck
+    - unconvert
+    - unparam
+    - varcheck
+    - scopelint
+    - nakedret
+    - prealloc
+    - gosec
+    - ineffassign
+    - depguard
+    - typecheck
+
+  disable-all: true
+
+linters-settings:
+  golint:
+    min-confidence: 0
+  goconst:
+    min-len: 2
+    min-occurrences: 2
+  gofmt:
+    auto-fix: false
+  govet:
+    check-shadowing: true
+    min-len: 3 # minimum length of string constant
+    min-occurrences: 6 # minimum number of occurrences

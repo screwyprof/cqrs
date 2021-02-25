@@ -52,18 +52,18 @@ func createDispatcher(accountReporter report.AccountReporting) *dispatcher.Dispa
 	aggregateFactory := aggregate.NewFactory()
 	aggregateFactory.RegisterAggregate(createAggregate)
 
-	aggregateStore := store.NewStore(
-		eventstore.NewInInMemoryEventStore(),
-		aggregateFactory,
-	)
-
 	accountDetailsProjector := eventhandler.New()
 	accountDetailsProjector.RegisterHandlers(eh.NewAccountDetailsProjector(accountReporter))
 
 	eventPublisher := eventbus.NewInMemoryEventBus()
 	eventPublisher.Register(accountDetailsProjector)
 
-	return dispatcher.NewDispatcher(aggregateStore, eventPublisher)
+	aggregateStore := store.NewStore(
+		eventstore.NewInInMemoryEventStore(eventPublisher),
+		aggregateFactory,
+	)
+
+	return dispatcher.NewDispatcher(aggregateStore)
 }
 
 func createAggregate(ID cqrs.Identifier) cqrs.AdvancedAggregate {

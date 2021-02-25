@@ -63,7 +63,7 @@ type Versionable interface {
 }
 
 // AdvancedAggregate is an aggregate which handles commands
-// and applies events after it automatically
+// and applies events after it automatically.
 type AdvancedAggregate interface {
 	Aggregate
 	Versionable

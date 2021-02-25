@@ -104,8 +104,8 @@ func TestAggregateStoreStore(t *testing.T) {
 	})
 }
 
-func createAgg(ID cqrs.Identifier) *aggregate.Advanced {
-	pureAgg := mock.NewTestAggregate(ID)
+func createAgg(id cqrs.Identifier) *aggregate.Advanced {
+	pureAgg := mock.NewTestAggregate(id)
 
 	commandHandler := aggregate.NewCommandHandler()
 	commandHandler.RegisterHandlers(pureAgg)
@@ -121,9 +121,8 @@ type aggregateStoreOptions struct {
 	staticEventApplier bool
 	loadedEvents       []cqrs.DomainEvent
 
-	loadErr      error
-	storeErr     error
-	publisherErr error
+	loadErr  error
+	storeErr error
 }
 
 type option func(*aggregateStoreOptions)
@@ -158,13 +157,13 @@ func withEventStoreSaveErr(err error) option {
 	}
 }
 
-func createAggregateStore(ID cqrs.Identifier, opts ...option) *store.AggregateStore {
+func createAggregateStore(id cqrs.Identifier, opts ...option) *store.AggregateStore {
 	config := &aggregateStoreOptions{}
 	for _, opt := range opts {
 		opt(config)
 	}
 
-	pureAgg := mock.NewTestAggregate(ID)
+	pureAgg := mock.NewTestAggregate(id)
 
 	applier := aggregate.NewEventApplier()
 	if !config.staticEventApplier {
