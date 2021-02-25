@@ -73,13 +73,10 @@ func TestNewDispatcherHandle(t *testing.T) {
 }
 
 type dispatcherOptions struct {
-	emptyFactory       bool
-	staticEventApplier bool
-	loadedEvents       []cqrs.DomainEvent
+	loadedEvents []cqrs.DomainEvent
 
-	loadErr      error
-	storeErr     error
-	publisherErr error
+	loadErr  error
+	storeErr error
 }
 
 type option func(*dispatcherOptions)
@@ -102,19 +99,13 @@ func withAggregateStoreSaveErr(err error) option {
 	}
 }
 
-func withPublisherErr(err error) option {
-	return func(o *dispatcherOptions) {
-		o.publisherErr = err
-	}
-}
-
-func createDispatcher(ID cqrs.Identifier, opts ...option) *dispatcher.Dispatcher {
+func createDispatcher(id cqrs.Identifier, opts ...option) *dispatcher.Dispatcher {
 	config := &dispatcherOptions{}
 	for _, opt := range opts {
 		opt(config)
 	}
 
-	pureAgg := mock.NewTestAggregate(ID)
+	pureAgg := mock.NewTestAggregate(id)
 
 	commandHandler := aggregate.NewCommandHandler()
 	commandHandler.RegisterHandlers(pureAgg)

@@ -4,11 +4,11 @@ package cqrs
 type EventMatcher func(DomainEvent) bool
 
 // MatchAny matches any event.
-//func MatchAny() EventMatcher {
+// func MatchAny() EventMatcher {
 //	return func(e DomainEvent) bool {
 //		return true
 //	}
-//}
+// }
 
 // MatchEvent matches a specific event type, nil events never match.
 func MatchEvent(t string) EventMatcher {

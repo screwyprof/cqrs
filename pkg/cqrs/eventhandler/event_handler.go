@@ -31,10 +31,11 @@ func (h *EventHandler) RegisterHandler(method string, handler cqrs.EventHandlerF
 
 // SubscribedTo implements cqrs.EventHandler interface.
 func (h *EventHandler) SubscribedTo() cqrs.EventMatcher {
-	var subscribedTo []string
+	subscribedTo := make([]string, 0, len(h.handlers))
 	for m := range h.handlers {
 		subscribedTo = append(subscribedTo, strings.TrimPrefix(m, "On"))
 	}
+
 	return cqrs.MatchAnyEventOf(subscribedTo...)
 }
 
@@ -44,7 +45,8 @@ func (h *EventHandler) Handle(e cqrs.DomainEvent) error {
 	defer h.handlersMu.RUnlock()
 
 	handlerID := "On" + e.EventType()
-	handler, ok := h.handlers[handlerID]
+
+	handler, ok := h.handlers["On"+e.EventType()]
 	if !ok {
 		return fmt.Errorf("event handler for %s event is not found", handlerID)
 	}
@@ -73,9 +75,11 @@ func (h *EventHandler) registerHandlerDynamically(method reflect.Method, entity 
 
 func (h *EventHandler) invokeEventHandler(method reflect.Method, entity interface{}, e cqrs.DomainEvent) error {
 	result := method.Func.Call([]reflect.Value{reflect.ValueOf(entity), reflect.ValueOf(e)})
+
 	resErr := result[0].Interface()
 	if resErr != nil {
 		return resErr.(error)
 	}
+
 	return nil
 }

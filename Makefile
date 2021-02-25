@@ -17,15 +17,11 @@ lint: ## run linters
 	@echo "$(OK_COLOR)--> Running linters$(NO_COLOR)"
 	tools/bin/golangci-lint run
 
-test: test-unit test-e2e ## run all tests
+test: test-unit ## run all tests
 
 test-unit: ## run unit tests
 	@echo "$(OK_COLOR)--> Running unit tests$(NO_COLOR)"
 	go test --race --count=1 ./...
-
-test-e2e: ## run e2e tests
-	@echo "$(OK_COLOR)--> Running E2E tests$(NO_COLOR)"
-	go test --tags "e2e" --race --count=1 ./tests/e2e/...
 
 test-coverage: ## run all tests with coverage
 	@echo "$(OK_COLOR)--> Generating code coverage$(NO_COLOR)"
@@ -33,7 +29,7 @@ test-coverage: ## run all tests with coverage
 
 fmt: ## format go files
 	@echo "$(OK_COLOR)--> Formatting go files$(NO_COLOR)"
-	go fmt ./...
+	gofumpt -l -w .
 
 clean: ## remove tools
 	@echo "$(OK_COLOR)--> Clean up$(NO_COLOR)"
@@ -46,4 +42,4 @@ help: ## show this help screen
 # To avoid unintended conflicts with file names, always add to .PHONY
 # unless there is a reason not to.
 # https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html
-.PHONY: all deps tools lint test test-unit test-e2e test-ci fmt clean help
+.PHONY: all deps tools lint test test-unit test-coverage fmt clean help

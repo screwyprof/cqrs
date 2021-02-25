@@ -7,10 +7,8 @@ import (
 	"github.com/screwyprof/cqrs/pkg/cqrs"
 )
 
-var (
-	// ErrConcurrencyViolation happens if aggregate has been modified concurrently.
-	ErrConcurrencyViolation = errors.New("concurrency error: aggregate versions differ")
-)
+// ErrConcurrencyViolation happens if aggregate has been modified concurrently.
+var ErrConcurrencyViolation = errors.New("concurrency error: aggregate versions differ")
 
 // InMemoryEventStore stores and loads events from memory.
 type InMemoryEventStore struct {
@@ -43,7 +41,6 @@ func (s *InMemoryEventStore) LoadEventsFor(aggregateID cqrs.Identifier) ([]cqrs.
 // StoreEventsFor saves evens of the given aggregate.
 func (s *InMemoryEventStore) StoreEventsFor(
 	aggregateID cqrs.Identifier, version int, events []cqrs.DomainEvent) error {
-
 	previousEvents, _ := s.LoadEventsFor(aggregateID)
 	if len(previousEvents) != version {
 		return ErrConcurrencyViolation

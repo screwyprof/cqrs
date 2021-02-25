@@ -8,10 +8,8 @@ import (
 	"github.com/screwyprof/cqrs/examples/bank/pkg/event"
 )
 
-var (
-	// ErrBalanceIsNotHighEnough happens when balance is not high enough.
-	ErrBalanceIsNotHighEnough = errors.New("balance is not high enough")
-)
+// ErrBalanceIsNotHighEnough happens when balance is not high enough.
+var ErrBalanceIsNotHighEnough = errors.New("balance is not high enough")
 
 // Aggregate handles operations with an account.
 type Aggregate struct {
@@ -66,11 +64,11 @@ func (a *Aggregate) OnAccountOpened(e event.AccountOpened) {
 // OnMoneyDeposited handles MoneyDeposited event.
 func (a *Aggregate) OnMoneyDeposited(e event.MoneyDeposited) {
 	a.balance = e.Balance
-	//a.Ledgers = append(acc.Ledgers, Ledger{Action: "debit", Amount: e.Amount})
+	// a.Ledgers = append(acc.Ledgers, Ledger{Action: "debit", Amount: e.Amount})
 }
 
 // OnMoneyWithdrawn handles MoneyWithdrawn event.
 func (a *Aggregate) OnMoneyWithdrawn(e event.MoneyWithdrawn) {
 	a.balance = e.Balance
-	//a.Ledgers = append(acc.Ledgers, Ledger{Action: "withdraw", Amount: e.Amount})
+	// a.Ledgers = append(acc.Ledgers, Ledger{Action: "withdraw", Amount: e.Amount})
 }

@@ -1,6 +1,6 @@
 package mock
 
-type SomethingHappened struct{
+type SomethingHappened struct {
 	Data string
 }
 
@@ -9,6 +9,7 @@ func (c SomethingHappened) EventType() string {
 }
 
 type SomethingElseHappened struct{}
+
 func (c SomethingElseHappened) EventType() string {
 	return "SomethingElseHappened"
 }

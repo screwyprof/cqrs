@@ -37,6 +37,7 @@ func (b *InMemoryEventBus) Publish(events ...cqrs.DomainEvent) error {
 			return err
 		}
 	}
+
 	return nil
 }
 

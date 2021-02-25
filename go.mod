@@ -6,4 +6,5 @@ require (
 	github.com/bxcodec/faker/v3 v3.0.0
 	github.com/golangci/golangci-lint v1.37.1 // indirect
 	github.com/stretchr/testify v1.7.0
+	mvdan.cc/gofumpt v0.1.0 // indirect
 )

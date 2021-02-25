@@ -6,10 +6,8 @@ import (
 	"github.com/screwyprof/cqrs/pkg/cqrs"
 )
 
-var (
-	// ErrCannotPublishEvents happens when event publisher cannot publish the given events.
-	ErrCannotPublishEvents = errors.New("cannot load aggregate")
-)
+// ErrCannotPublishEvents happens when event publisher cannot publish the given events.
+var ErrCannotPublishEvents = errors.New("cannot load aggregate")
 
 // EventPublisherMock mocks event store.
 type EventPublisherMock struct {
@@ -20,4 +18,3 @@ type EventPublisherMock struct {
 func (m *EventPublisherMock) Publish(e ...cqrs.DomainEvent) error {
 	return m.Publisher(e...)
 }
-

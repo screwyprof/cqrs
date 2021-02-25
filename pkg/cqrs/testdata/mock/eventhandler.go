@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ErrCannotHandleEvent = errors.New("cannot handle event")
+	ErrCannotHandleEvent    = errors.New("cannot handle event")
 	ErrEventHandlerNotFound = errors.New("event handler for OnSomethingElseHappened event is not found")
 )
 
@@ -25,12 +25,11 @@ func (h *TestEventHandler) OnSomethingElseHappened(e SomethingElseHappened) erro
 }
 
 func (h *TestEventHandler) SomeInvalidMethod() {
-
 }
 
 type EventHandlerMock struct {
-	Err error
-	Matcher cqrs.EventMatcher
+	Err      error
+	Matcher  cqrs.EventMatcher
 	Happened []cqrs.DomainEvent
 }
 
