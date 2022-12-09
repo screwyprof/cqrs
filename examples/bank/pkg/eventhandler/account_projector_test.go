@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/bxcodec/faker/v3"
+	"github.com/bxcodec/faker/v4"
 	m "github.com/stretchr/testify/mock"
 
 	"github.com/screwyprof/cqrs/pkg/assert"
