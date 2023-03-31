@@ -4,12 +4,11 @@ import (
 	"testing"
 
 	"github.com/go-faker/faker/v4"
-
-	"github.com/screwyprof/cqrs/pkg/assert"
-	"github.com/screwyprof/cqrs/pkg/cqrs/eventstore"
-	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/screwyprof/cqrs/pkg/cqrs"
+	"github.com/screwyprof/cqrs/pkg/cqrs/eventstore"
+	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
 )
 
 // ensure that event store implements cqrs.EventStore interface.
@@ -25,7 +24,7 @@ func TestNewInInMemoryEventStore(t *testing.T) {
 		factory := func() {
 			eventstore.NewInInMemoryEventStore(nil)
 		}
-		assert.Panic(t, factory)
+		assert.Panics(t, factory)
 	})
 }
 
@@ -38,14 +37,14 @@ func TestInMemoryEventStoreLoadEventsFor(t *testing.T) {
 		want := []cqrs.DomainEvent{mock.SomethingHappened{Data: faker.Word()}}
 
 		err := es.StoreEventsFor(ID, 0, want)
-		assert.Ok(t, err)
+		assert.NoError(t, err)
 
 		// act
 		got, err := es.LoadEventsFor(ID)
 
 		// assert
-		assert.Ok(t, err)
-		assert.Equals(t, want, got)
+		assert.NoError(t, err)
+		assert.Equal(t, want, got)
 	})
 }
 
@@ -59,7 +58,7 @@ func TestInMemoryEventStoreStoreEventsFor(t *testing.T) {
 		err := es.StoreEventsFor(ID, 1, []cqrs.DomainEvent{mock.SomethingHappened{}})
 
 		// assert
-		assert.Equals(t, eventstore.ErrConcurrencyViolation, err)
+		assert.Equal(t, eventstore.ErrConcurrencyViolation, err)
 	})
 }
 

@@ -6,14 +6,12 @@ import (
 	"testing"
 
 	"github.com/go-faker/faker/v4"
-
+	"github.com/stretchr/testify/assert"
 	m "github.com/stretchr/testify/mock"
-
-	"github.com/screwyprof/cqrs/pkg/assert"
-	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
 
 	"github.com/screwyprof/cqrs/examples/bank/internal/ui"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/report"
+	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
 )
 
 func TestNewConsolePrinter(t *testing.T) {
@@ -21,14 +19,14 @@ func TestNewConsolePrinter(t *testing.T) {
 		factory := func() {
 			ui.NewConsolePrinter(nil, nil)
 		}
-		assert.Panic(t, factory)
+		assert.Panics(t, factory)
 	})
 
 	t.Run("ItPanicsIfAccountReporterIsNotGiven", func(t *testing.T) {
 		factory := func() {
 			ui.NewConsolePrinter(&bytes.Buffer{}, nil)
 		}
-		assert.Panic(t, factory)
+		assert.Panics(t, factory)
 	})
 }
 
@@ -82,9 +80,9 @@ func TestConsolePrinter_PrintAccountStatement(t *testing.T) {
 		err := printer.PrintAccountStatement(ID)
 
 		// assert
-		assert.Ok(t, err)
+		assert.NoError(t, err)
 		accountReporter.AssertExpectations(t)
-		assert.Equals(t, want, buf.String())
+		assert.Equal(t, want, buf.String())
 	})
 
 	t.Run("ItReturnsAnErrorIfItCannotPrintAccountStatement", func(t *testing.T) {
@@ -103,7 +101,7 @@ func TestConsolePrinter_PrintAccountStatement(t *testing.T) {
 		err := printer.PrintAccountStatement(ID)
 
 		// assert
-		assert.Equals(t, want, err)
+		assert.Equal(t, want, err)
 	})
 }
 

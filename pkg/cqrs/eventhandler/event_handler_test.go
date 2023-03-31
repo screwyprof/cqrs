@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/go-faker/faker/v4"
+	"github.com/stretchr/testify/assert"
 
-	"github.com/screwyprof/cqrs/pkg/assert"
 	"github.com/screwyprof/cqrs/pkg/cqrs"
 	"github.com/screwyprof/cqrs/pkg/cqrs/eventhandler"
 	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
@@ -34,8 +34,8 @@ func TestEventHandlerHandle(t *testing.T) {
 		err := s.Handle(mock.SomethingHappened{Data: want})
 
 		// assert
-		assert.Ok(t, err)
-		assert.Equals(t, want, eh.SomethingHappened)
+		assert.NoError(t, err)
+		assert.Equal(t, want, eh.SomethingHappened)
 	})
 
 	t.Run("ItFailsIfEventHandlerIsNotRegistered", func(t *testing.T) {
@@ -46,7 +46,7 @@ func TestEventHandlerHandle(t *testing.T) {
 		err := s.Handle(mock.SomethingElseHappened{})
 
 		// assert
-		assert.Equals(t, mock.ErrEventHandlerNotFound, err)
+		assert.Equal(t, mock.ErrEventHandlerNotFound, err)
 	})
 
 	t.Run("ItFailsIfEventHandlerReturnsAnError", func(t *testing.T) {
@@ -60,7 +60,7 @@ func TestEventHandlerHandle(t *testing.T) {
 		err := s.Handle(mock.SomethingElseHappened{})
 
 		// assert
-		assert.Equals(t, mock.ErrCannotHandleEvent, err)
+		assert.Equal(t, mock.ErrCannotHandleEvent, err)
 	})
 }
 

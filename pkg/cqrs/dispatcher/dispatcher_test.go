@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/go-faker/faker/v4"
+	"github.com/stretchr/testify/assert"
 
-	"github.com/screwyprof/cqrs/pkg/assert"
 	"github.com/screwyprof/cqrs/pkg/cqrs"
 	"github.com/screwyprof/cqrs/pkg/cqrs/aggregate"
 	"github.com/screwyprof/cqrs/pkg/cqrs/dispatcher"
@@ -21,7 +21,7 @@ func TestNewDispatcher(t *testing.T) {
 		factory := func() {
 			dispatcher.NewDispatcher(nil)
 		}
-		assert.Panic(t, factory)
+		assert.Panics(t, factory)
 	})
 }
 

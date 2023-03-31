@@ -4,8 +4,7 @@ import (
 	"testing"
 
 	"github.com/go-faker/faker/v4"
-
-	"github.com/screwyprof/cqrs/pkg/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 type testEvent struct{}

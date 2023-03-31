@@ -3,6 +3,7 @@ module github.com/screwyprof/cqrs
 go 1.20
 
 require (
+	github.com/daixiang0/gci v0.10.1
 	github.com/go-faker/faker/v4 v4.1.0
 	github.com/golangci/golangci-lint v1.52.2
 	github.com/stretchr/testify v1.8.2
@@ -35,7 +36,6 @@ require (
 	github.com/charithe/durationcheck v0.0.10 // indirect
 	github.com/chavacava/garif v0.0.0-20230227094218-b8c73b2037b8 // indirect
 	github.com/curioswitch/go-reassign v0.2.0 // indirect
-	github.com/daixiang0/gci v0.10.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/denis-tingaikin/go-header v0.4.3 // indirect
 	github.com/esimonov/ifshort v1.0.4 // indirect

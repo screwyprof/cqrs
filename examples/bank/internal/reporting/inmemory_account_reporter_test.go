@@ -4,12 +4,11 @@ import (
 	"testing"
 
 	"github.com/go-faker/faker/v4"
-
-	"github.com/screwyprof/cqrs/pkg/assert"
-	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/screwyprof/cqrs/examples/bank/internal/reporting"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/report"
+	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
 )
 
 // ensure that account reporter implements report.AccountReporting interface.
@@ -46,8 +45,8 @@ func TestInMemoryAccountReporter(t *testing.T) {
 
 		got, err := accountReporter.AccountDetailsFor(ID)
 
-		assert.Ok(t, err)
-		assert.Equals(t, want, got)
+		assert.NoError(t, err)
+		assert.Equal(t, want, got)
 	})
 
 	t.Run("ItShouldReturnAccountNotFoundErrIfTheGivenAccountIsNotFound", func(t *testing.T) {
@@ -56,6 +55,6 @@ func TestInMemoryAccountReporter(t *testing.T) {
 
 		_, err := accountReporter.AccountDetailsFor(ID)
 
-		assert.Equals(t, reporting.ErrAccountNotFound, err)
+		assert.Equal(t, reporting.ErrAccountNotFound, err)
 	})
 }

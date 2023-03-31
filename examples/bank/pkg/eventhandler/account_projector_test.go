@@ -5,16 +5,14 @@ import (
 	"testing"
 
 	"github.com/go-faker/faker/v4"
-
+	"github.com/stretchr/testify/assert"
 	m "github.com/stretchr/testify/mock"
-
-	"github.com/screwyprof/cqrs/pkg/assert"
-	"github.com/screwyprof/cqrs/pkg/cqrs/eventhandler"
-	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
 
 	"github.com/screwyprof/cqrs/examples/bank/pkg/event"
 	eh "github.com/screwyprof/cqrs/examples/bank/pkg/eventhandler"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/report"
+	"github.com/screwyprof/cqrs/pkg/cqrs/eventhandler"
+	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
 )
 
 func TestNewAccountDetailsProjector(t *testing.T) {
@@ -27,7 +25,7 @@ func TestNewAccountDetailsProjector(t *testing.T) {
 		factory := func() {
 			eh.NewAccountDetailsProjector(nil)
 		}
-		assert.Panic(t, factory)
+		assert.Panics(t, factory)
 	})
 }
 
@@ -52,7 +50,7 @@ func TestAccountDetailsProjector(t *testing.T) {
 		err := accountProjector.Handle(event.AccountOpened{ID: ID, Number: number})
 
 		// assert
-		assert.Ok(t, err)
+		assert.NoError(t, err)
 		accountReporter.AssertCalled(t, "Save", want)
 	})
 
@@ -76,7 +74,7 @@ func TestAccountDetailsProjector(t *testing.T) {
 		err := accountProjector.Handle(event.MoneyDeposited{ID: ID, Amount: amount, Balance: balance})
 
 		// assert
-		assert.Ok(t, err)
+		assert.NoError(t, err)
 		accountReporter.AssertExpectations(t)
 	})
 
@@ -95,7 +93,7 @@ func TestAccountDetailsProjector(t *testing.T) {
 			event.MoneyDeposited{ID: ID, Amount: faker.UnixTime(), Balance: faker.UnixTime()})
 
 		// assert
-		assert.Equals(t, want, err)
+		assert.Equal(t, want, err)
 		accountReporter.AssertExpectations(t)
 	})
 
@@ -119,7 +117,7 @@ func TestAccountDetailsProjector(t *testing.T) {
 		err := accountProjector.Handle(event.MoneyWithdrawn{ID: ID, Amount: amount, Balance: balance})
 
 		// assert
-		assert.Ok(t, err)
+		assert.NoError(t, err)
 		accountReporter.AssertExpectations(t)
 	})
 
@@ -138,7 +136,7 @@ func TestAccountDetailsProjector(t *testing.T) {
 			event.MoneyWithdrawn{ID: ID, Amount: faker.UnixTime(), Balance: faker.UnixTime()})
 
 		// assert
-		assert.Equals(t, want, err)
+		assert.Equal(t, want, err)
 		accountReporter.AssertExpectations(t)
 	})
 }

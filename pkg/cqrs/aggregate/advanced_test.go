@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/go-faker/faker/v4"
+	"github.com/stretchr/testify/assert"
 
-	"github.com/screwyprof/cqrs/pkg/assert"
 	"github.com/screwyprof/cqrs/pkg/cqrs"
 	"github.com/screwyprof/cqrs/pkg/cqrs/aggregate"
 	. "github.com/screwyprof/cqrs/pkg/cqrs/aggregate/testdata/fixture"
@@ -20,14 +20,14 @@ func TestNewBase(t *testing.T) {
 		factory := func() {
 			aggregate.NewAdvanced(nil, nil, nil)
 		}
-		assert.Panic(t, factory)
+		assert.Panics(t, factory)
 	})
 
 	t.Run("ItPanicsIfCommandHandlerIsNotGiven", func(t *testing.T) {
 		factory := func() {
 			aggregate.NewAdvanced(NewTestAggregate(StringIdentifier(faker.UUIDHyphenated())), nil, nil)
 		}
-		assert.Panic(t, factory)
+		assert.Panics(t, factory)
 	})
 
 	t.Run("ItPanicsIfEventApplierIsNotGiven", func(t *testing.T) {
@@ -38,7 +38,7 @@ func TestNewBase(t *testing.T) {
 				nil,
 			)
 		}
-		assert.Panic(t, factory)
+		assert.Panics(t, factory)
 	})
 }
 
@@ -72,7 +72,7 @@ func TestBaseVersion(t *testing.T) {
 	t.Run("ItReturnsVersion", func(t *testing.T) {
 		agg := createTestAggWithDefaultCommandHandlerAndEventApplier()
 
-		assert.Equals(t, 0, agg.Version())
+		assert.Equal(t, 0, agg.Version())
 	})
 }
 
@@ -98,8 +98,8 @@ func TestBaseApply(t *testing.T) {
 
 		err := agg.Apply(SomethingHappened{})
 
-		assert.Ok(t, err)
-		assert.Equals(t, 1, agg.Version())
+		assert.NoError(t, err)
+		assert.Equal(t, 1, agg.Version())
 	})
 }
 

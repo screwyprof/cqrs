@@ -1,4 +1,3 @@
-pkg/assert/*
 pkg/cqrs/testdata/mock/*
 pkg/cqrs/aggregate/testdata/fixture/*
 pkg/cqrs/dispatcher/testdata/fixture/*

@@ -3,7 +3,8 @@ package eventbus_test
 import (
 	"testing"
 
-	"github.com/screwyprof/cqrs/pkg/assert"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/screwyprof/cqrs/pkg/cqrs"
 	"github.com/screwyprof/cqrs/pkg/cqrs/eventbus"
 	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
@@ -32,7 +33,7 @@ func TestInMemoryEventBus_Publish(t *testing.T) {
 		err := b.Publish(mock.SomethingHappened{}, mock.SomethingElseHappened{})
 
 		// assert
-		assert.Equals(t, mock.ErrCannotHandleEvent, err)
+		assert.Equal(t, mock.ErrCannotHandleEvent, err)
 	})
 
 	t.Run("ItPublishesEvents", func(t *testing.T) {
@@ -47,8 +48,8 @@ func TestInMemoryEventBus_Publish(t *testing.T) {
 		err := b.Publish(mock.SomethingHappened{}, mock.SomethingElseHappened{})
 
 		// assert
-		assert.Ok(t, err)
-		assert.Equals(t, want, eventHandler.Happened)
+		assert.NoError(t, err)
+		assert.Equal(t, want, eventHandler.Happened)
 	})
 
 	t.Run("ItHandlesOnlyMatchedEvents", func(t *testing.T) {
@@ -68,7 +69,7 @@ func TestInMemoryEventBus_Publish(t *testing.T) {
 		}...)
 
 		// assert
-		assert.Ok(t, err)
-		assert.Equals(t, want, eventHandler.Happened)
+		assert.NoError(t, err)
+		assert.Equal(t, want, eventHandler.Happened)
 	})
 }
