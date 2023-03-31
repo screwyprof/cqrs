@@ -70,7 +70,8 @@ func (h *CommandHandler) methodHasValidSignature(method reflect.Method) bool {
 }
 
 func (h *CommandHandler) invokeCommandHandler(
-	method reflect.Method, aggregate cqrs.Aggregate, c cqrs.Command) ([]cqrs.DomainEvent, error) {
+	method reflect.Method, aggregate cqrs.Aggregate, c cqrs.Command,
+) ([]cqrs.DomainEvent, error) {
 	result := method.Func.Call([]reflect.Value{reflect.ValueOf(aggregate), reflect.ValueOf(c)})
 
 	resErr := result[1].Interface()

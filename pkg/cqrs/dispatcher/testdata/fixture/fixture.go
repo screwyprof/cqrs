@@ -25,11 +25,12 @@ type DispatcherTester func(given GivenFn, when WhenFn, then ThenFn)
 // Test runs the test.
 //
 // Example:
-//  Test(t)(
-//	  Given(dispatcher),
-//	  When(testdata.TestCommand{Param: "param"}),
-//	  Then(testdata.TestEvent{Data: "param"}),
-//  )
+//
+//	 Test(t)(
+//		  Given(dispatcher),
+//		  When(testdata.TestCommand{Param: "param"}),
+//		  Then(testdata.TestEvent{Data: "param"}),
+//	 )
 func Test(t *testing.T) DispatcherTester {
 	return func(given GivenFn, when WhenFn, then ThenFn) {
 		t.Helper()

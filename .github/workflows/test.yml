@@ -1,4 +1,4 @@
-name: form3api-client
+name: test
 on: push
 jobs:
   tests:

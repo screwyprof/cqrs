@@ -3,7 +3,7 @@ package store_test
 import (
 	"testing"
 
-	"github.com/bxcodec/faker/v3"
+	"github.com/bxcodec/faker/v4"
 
 	"github.com/screwyprof/cqrs/pkg/assert"
 	"github.com/screwyprof/cqrs/pkg/cqrs"

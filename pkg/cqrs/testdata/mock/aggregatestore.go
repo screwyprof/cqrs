@@ -21,7 +21,8 @@ type AggregateStoreMock struct {
 
 // Load implements cqrs.AggregateStore interface.
 func (m *AggregateStoreMock) Load(
-	aggregateID cqrs.Identifier, aggregateType string) (cqrs.AdvancedAggregate, error) {
+	aggregateID cqrs.Identifier, aggregateType string,
+) (cqrs.AdvancedAggregate, error) {
 	return m.Loader(aggregateID, aggregateType)
 }
 

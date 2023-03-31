@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/bxcodec/faker/v3"
+	"github.com/bxcodec/faker/v4"
 	m "github.com/stretchr/testify/mock"
 
 	"github.com/screwyprof/cqrs/pkg/assert"
@@ -90,7 +90,7 @@ func TestConsolePrinter_PrintAccountStatement(t *testing.T) {
 		// arrange
 		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 
-		want := fmt.Errorf("some error occurred")
+		want := fmt.Errorf("some error occured")
 
 		var account *report.Account
 		accountReporter := &accountReporterMock{}

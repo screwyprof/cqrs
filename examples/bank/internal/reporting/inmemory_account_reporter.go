@@ -7,7 +7,6 @@ import (
 	"github.com/screwyprof/cqrs/examples/bank/pkg/report"
 )
 
-// ErrAccountNotFound happens when account report is not found.
 var ErrAccountNotFound = errors.New("account is not found")
 
 // InMemoryAccountReporter stores and retrieves account reports from memory.

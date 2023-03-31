@@ -40,7 +40,8 @@ func (s *InMemoryEventStore) LoadEventsFor(aggregateID cqrs.Identifier) ([]cqrs.
 
 // StoreEventsFor saves evens of the given aggregate.
 func (s *InMemoryEventStore) StoreEventsFor(
-	aggregateID cqrs.Identifier, version int, events []cqrs.DomainEvent) error {
+	aggregateID cqrs.Identifier, version int, events []cqrs.DomainEvent,
+) error {
 	previousEvents, _ := s.LoadEventsFor(aggregateID)
 	if len(previousEvents) != version {
 		return ErrConcurrencyViolation
