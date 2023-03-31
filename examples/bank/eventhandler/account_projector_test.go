@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	m "github.com/stretchr/testify/mock"
 
-	"github.com/screwyprof/cqrs/examples/bank/pkg/event"
-	eh "github.com/screwyprof/cqrs/examples/bank/pkg/eventhandler"
-	"github.com/screwyprof/cqrs/examples/bank/pkg/report"
+	"github.com/screwyprof/cqrs/examples/bank/domain/event"
+	eh "github.com/screwyprof/cqrs/examples/bank/eventhandler"
+	"github.com/screwyprof/cqrs/examples/bank/report"
 	"github.com/screwyprof/cqrs/testdata/mock"
 	"github.com/screwyprof/cqrs/x/eventhandler"
 )

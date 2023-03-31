@@ -1,17 +1,17 @@
 package eventhandler
 
 import (
-	"github.com/screwyprof/cqrs/examples/bank/pkg/event"
-	"github.com/screwyprof/cqrs/examples/bank/pkg/report"
+	"github.com/screwyprof/cqrs/examples/bank/domain/event"
+	"github.com/screwyprof/cqrs/examples/bank/report"
 )
 
 // AccountDetailsProjector projects account details to the read side.
 type AccountDetailsProjector struct {
-	accountReporter report.AccountReporting
+	accountReporter AccountReporting
 }
 
 // NewAccountDetailsProjector creates new instance of AccountDetailsProjector.
-func NewAccountDetailsProjector(accountReporter report.AccountReporting) *AccountDetailsProjector {
+func NewAccountDetailsProjector(accountReporter AccountReporting) *AccountDetailsProjector {
 	if accountReporter == nil {
 		panic("accountReporter is required")
 	}

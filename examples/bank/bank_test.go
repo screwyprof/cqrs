@@ -8,12 +8,11 @@ import (
 
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate"
-	"github.com/screwyprof/cqrs/examples/bank/internal/reporting"
-	"github.com/screwyprof/cqrs/examples/bank/internal/ui"
-	"github.com/screwyprof/cqrs/examples/bank/pkg/command"
-	"github.com/screwyprof/cqrs/examples/bank/pkg/domain/account"
-	eh "github.com/screwyprof/cqrs/examples/bank/pkg/eventhandler"
-	"github.com/screwyprof/cqrs/examples/bank/pkg/report"
+	"github.com/screwyprof/cqrs/examples/bank/domain/account"
+	"github.com/screwyprof/cqrs/examples/bank/domain/command"
+	eh "github.com/screwyprof/cqrs/examples/bank/eventhandler"
+	"github.com/screwyprof/cqrs/examples/bank/reporting"
+	"github.com/screwyprof/cqrs/examples/bank/ui"
 	"github.com/screwyprof/cqrs/testdata/mock"
 	"github.com/screwyprof/cqrs/x/dispatcher"
 	"github.com/screwyprof/cqrs/x/eventbus"
@@ -46,7 +45,7 @@ func Example() {
 	// 3 |   500.00 |  1400.00
 }
 
-func createDispatcher(accountReporter report.AccountReporting) *dispatcher.Dispatcher {
+func createDispatcher(accountReporter eh.AccountReporting) *dispatcher.Dispatcher {
 	aggregateFactory := aggregate.NewFactory()
 	aggregateFactory.RegisterAggregate(createAggregate)
 

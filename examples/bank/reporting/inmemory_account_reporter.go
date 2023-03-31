@@ -4,7 +4,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/screwyprof/cqrs/examples/bank/pkg/report"
+	"github.com/screwyprof/cqrs/examples/bank/report"
 )
 
 var ErrAccountNotFound = errors.New("account is not found")

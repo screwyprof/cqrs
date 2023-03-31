@@ -9,10 +9,10 @@ import (
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate"
 	. "github.com/screwyprof/cqrs/aggregate/testdata/fixture"
-	"github.com/screwyprof/cqrs/examples/bank/pkg/command"
-	"github.com/screwyprof/cqrs/examples/bank/pkg/domain"
-	"github.com/screwyprof/cqrs/examples/bank/pkg/domain/account"
-	"github.com/screwyprof/cqrs/examples/bank/pkg/event"
+	"github.com/screwyprof/cqrs/examples/bank/domain"
+	"github.com/screwyprof/cqrs/examples/bank/domain/account"
+	"github.com/screwyprof/cqrs/examples/bank/domain/command"
+	"github.com/screwyprof/cqrs/examples/bank/domain/event"
 	"github.com/screwyprof/cqrs/testdata/mock"
 )
 

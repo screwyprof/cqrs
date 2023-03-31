@@ -1,6 +1,6 @@
 package event
 
-import "github.com/screwyprof/cqrs/examples/bank/pkg/domain"
+import "github.com/screwyprof/cqrs/examples/bank/domain"
 
 // MoneyWithdrawn is an event which happens when an account is debited.
 type MoneyWithdrawn struct {

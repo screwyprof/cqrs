@@ -1,6 +1,6 @@
 package command
 
-import "github.com/screwyprof/cqrs/examples/bank/pkg/domain"
+import "github.com/screwyprof/cqrs/examples/bank/domain"
 
 // DepositMoney is a command to credit an account.
 type DepositMoney struct {

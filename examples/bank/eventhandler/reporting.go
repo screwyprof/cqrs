@@ -1,18 +1,15 @@
-package report
+package eventhandler
 
-import "fmt"
-
-// Identifier an object identifier.
-type Identifier = fmt.Stringer
+import "github.com/screwyprof/cqrs/examples/bank/report"
 
 // GetAccountDetails returns detailed account info.
 type GetAccountDetails interface {
-	AccountDetailsFor(ID Identifier) (*Account, error)
+	AccountDetailsFor(ID report.Identifier) (*report.Account, error)
 }
 
 // AccountSaver saves account info.
 type AccountSaver interface {
-	Save(account *Account)
+	Save(account *report.Account)
 }
 
 // AccountReporting handles account read side.

@@ -1,6 +1,6 @@
 package command
 
-import "github.com/screwyprof/cqrs/examples/bank/pkg/domain"
+import "github.com/screwyprof/cqrs/examples/bank/domain"
 
 // WithdrawMoney is a command to debit an account.
 type WithdrawMoney struct {

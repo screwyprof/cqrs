@@ -1,6 +1,6 @@
 package command
 
-import "github.com/screwyprof/cqrs/examples/bank/pkg/domain"
+import "github.com/screwyprof/cqrs/examples/bank/domain"
 
 // OpenAccount is a command to open an account.
 type OpenAccount struct {

@@ -6,13 +6,10 @@ import (
 	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/screwyprof/cqrs/examples/bank/internal/reporting"
-	"github.com/screwyprof/cqrs/examples/bank/pkg/report"
+	"github.com/screwyprof/cqrs/examples/bank/report"
+	"github.com/screwyprof/cqrs/examples/bank/reporting"
 	"github.com/screwyprof/cqrs/testdata/mock"
 )
-
-// ensure that account reporter implements report.AccountReporting interface.
-var _ report.AccountReporting = (*reporting.InMemoryAccountReporter)(nil)
 
 func TestNewInMemoryAccountReporter(t *testing.T) {
 	t.Run("ItShouldCreateNewInstance", func(t *testing.T) {

@@ -3,9 +3,9 @@ package account
 import (
 	"errors"
 
-	"github.com/screwyprof/cqrs/examples/bank/pkg/command"
-	"github.com/screwyprof/cqrs/examples/bank/pkg/domain"
-	"github.com/screwyprof/cqrs/examples/bank/pkg/event"
+	"github.com/screwyprof/cqrs/examples/bank/domain"
+	"github.com/screwyprof/cqrs/examples/bank/domain/command"
+	"github.com/screwyprof/cqrs/examples/bank/domain/event"
 )
 
 // ErrBalanceIsNotHighEnough happens when balance is not high enough.

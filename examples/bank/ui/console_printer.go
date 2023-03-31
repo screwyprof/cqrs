@@ -4,17 +4,18 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/screwyprof/cqrs/examples/bank/pkg/report"
+	"github.com/screwyprof/cqrs/examples/bank/eventhandler"
+	"github.com/screwyprof/cqrs/examples/bank/report"
 )
 
 // ConsolePrinter prints account statement to console.
 type ConsolePrinter struct {
 	w               io.Writer
-	accountReporter report.GetAccountDetails
+	accountReporter eventhandler.GetAccountDetails
 }
 
 // NewConsolePrinter creates new instance of ConsolePrinter.
-func NewConsolePrinter(w io.Writer, accountReporter report.GetAccountDetails) *ConsolePrinter {
+func NewConsolePrinter(w io.Writer, accountReporter eventhandler.GetAccountDetails) *ConsolePrinter {
 	if w == nil {
 		panic("writer is required")
 	}
