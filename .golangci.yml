@@ -132,8 +132,6 @@ output:
   sort-results: true
 
 linters-settings:
-  golint:
-    min-confidence: 0
   goconst:
     min-len: 2
     min-occurrences: 2
