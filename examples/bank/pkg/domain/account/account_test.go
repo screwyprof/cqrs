@@ -6,14 +6,14 @@ import (
 	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/screwyprof/cqrs"
+	"github.com/screwyprof/cqrs/aggregate"
+	. "github.com/screwyprof/cqrs/aggregate/testdata/fixture"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/command"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/domain"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/domain/account"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/event"
-	"github.com/screwyprof/cqrs/pkg/cqrs"
-	"github.com/screwyprof/cqrs/pkg/cqrs/aggregate"
-	. "github.com/screwyprof/cqrs/pkg/cqrs/aggregate/testdata/fixture"
-	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
+	"github.com/screwyprof/cqrs/testdata/mock"
 )
 
 // ensure that game aggregate implements cqrs.Aggregate interface.

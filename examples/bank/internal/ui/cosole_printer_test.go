@@ -11,7 +11,7 @@ import (
 
 	"github.com/screwyprof/cqrs/examples/bank/internal/ui"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/report"
-	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
+	"github.com/screwyprof/cqrs/testdata/mock"
 )
 
 func TestNewConsolePrinter(t *testing.T) {

@@ -8,7 +8,7 @@ import (
 
 	"github.com/screwyprof/cqrs/examples/bank/internal/reporting"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/report"
-	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
+	"github.com/screwyprof/cqrs/testdata/mock"
 )
 
 // ensure that account reporter implements report.AccountReporting interface.

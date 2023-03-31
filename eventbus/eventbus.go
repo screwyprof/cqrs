@@ -1,0 +1,59 @@
+package eventbus
+
+import (
+	"sync"
+
+	cqrs2 "github.com/screwyprof/cqrs"
+)
+
+// InMemoryEventBus publishes events.
+type InMemoryEventBus struct {
+	eventHandlers   map[cqrs2.EventHandler]struct{}
+	eventHandlersMu sync.RWMutex
+}
+
+// NewInMemoryEventBus creates a new instance of InMemoryEventBus.
+func NewInMemoryEventBus() *InMemoryEventBus {
+	return &InMemoryEventBus{
+		eventHandlers: make(map[cqrs2.EventHandler]struct{}),
+	}
+}
+
+// Register registers event handler.
+func (b *InMemoryEventBus) Register(h cqrs2.EventHandler) {
+	b.eventHandlersMu.Lock()
+	defer b.eventHandlersMu.Unlock()
+
+	b.eventHandlers[h] = struct{}{}
+}
+
+// Publish implements cqrs.EventPublisher interface.
+func (b *InMemoryEventBus) Publish(events ...cqrs2.DomainEvent) error {
+	b.eventHandlersMu.RLock()
+	defer b.eventHandlersMu.RUnlock()
+
+	for h := range b.eventHandlers {
+		if err := b.handleEvents(h, events...); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (b *InMemoryEventBus) handleEvents(h cqrs2.EventHandler, events ...cqrs2.DomainEvent) error {
+	for _, e := range events {
+		err := b.handleEventIfMatches(h.SubscribedTo(), h, e)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (b *InMemoryEventBus) handleEventIfMatches(m cqrs2.EventMatcher, h cqrs2.EventHandler, e cqrs2.DomainEvent) error {
+	if !m(e) {
+		return nil
+	}
+	return h.Handle(e)
+}
