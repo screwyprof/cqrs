@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/screwyprof/cqrs"
-	"github.com/screwyprof/cqrs/eventstore"
 	"github.com/screwyprof/cqrs/testdata/mock"
+	"github.com/screwyprof/cqrs/x/eventstore"
 )
 
 // ensure that event store implements cqrs.EventStore interface.

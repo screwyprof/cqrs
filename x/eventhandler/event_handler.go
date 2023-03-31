@@ -6,41 +6,41 @@ import (
 	"strings"
 	"sync"
 
-	cqrs2 "github.com/screwyprof/cqrs"
+	"github.com/screwyprof/cqrs"
 )
 
 // EventHandler handles events.
 type EventHandler struct {
-	handlers   map[string]cqrs2.EventHandlerFunc
+	handlers   map[string]cqrs.EventHandlerFunc
 	handlersMu sync.RWMutex
 }
 
 // New creates new instance of New.
 func New() *EventHandler {
 	return &EventHandler{
-		handlers: make(map[string]cqrs2.EventHandlerFunc),
+		handlers: make(map[string]cqrs.EventHandlerFunc),
 	}
 }
 
 // RegisterHandler registers an event handler for the given method.
-func (h *EventHandler) RegisterHandler(method string, handler cqrs2.EventHandlerFunc) {
+func (h *EventHandler) RegisterHandler(method string, handler cqrs.EventHandlerFunc) {
 	h.handlersMu.Lock()
 	defer h.handlersMu.Unlock()
 	h.handlers[method] = handler
 }
 
 // SubscribedTo implements cqrs.EventHandler interface.
-func (h *EventHandler) SubscribedTo() cqrs2.EventMatcher {
+func (h *EventHandler) SubscribedTo() cqrs.EventMatcher {
 	subscribedTo := make([]string, 0, len(h.handlers))
 	for m := range h.handlers {
 		subscribedTo = append(subscribedTo, strings.TrimPrefix(m, "On"))
 	}
 
-	return cqrs2.MatchAnyEventOf(subscribedTo...)
+	return cqrs.MatchAnyEventOf(subscribedTo...)
 }
 
 // Handle implements cqrs.EventHandler interface.
-func (h *EventHandler) Handle(e cqrs2.DomainEvent) error {
+func (h *EventHandler) Handle(e cqrs.DomainEvent) error {
 	h.handlersMu.RLock()
 	defer h.handlersMu.RUnlock()
 
@@ -68,12 +68,12 @@ func (h *EventHandler) registerHandlerDynamically(method reflect.Method, entity 
 		return
 	}
 
-	h.RegisterHandler(method.Name, func(e cqrs2.DomainEvent) error {
+	h.RegisterHandler(method.Name, func(e cqrs.DomainEvent) error {
 		return h.invokeEventHandler(method, entity, e)
 	})
 }
 
-func (h *EventHandler) invokeEventHandler(method reflect.Method, entity interface{}, e cqrs2.DomainEvent) error {
+func (h *EventHandler) invokeEventHandler(method reflect.Method, entity interface{}, e cqrs.DomainEvent) error {
 	result := method.Func.Call([]reflect.Value{reflect.ValueOf(entity), reflect.ValueOf(e)})
 
 	resErr := result[0].Interface()

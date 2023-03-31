@@ -26,7 +26,7 @@ func (m *AggregateStoreMock) Load(
 	return m.Loader(aggregateID, aggregateType)
 }
 
-// StoreEventsFor implements cqrs.AggregateStore interface.
+// Store implements cqrs.AggregateStore interface.
 func (m *AggregateStoreMock) Store(aggregate cqrs.AdvancedAggregate, events ...cqrs.DomainEvent) error {
 	return m.Saver(aggregate, events...)
 }

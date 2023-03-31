@@ -8,9 +8,9 @@ import (
 
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate"
-	"github.com/screwyprof/cqrs/dispatcher"
-	. "github.com/screwyprof/cqrs/dispatcher/testdata/fixture"
 	"github.com/screwyprof/cqrs/testdata/mock"
+	"github.com/screwyprof/cqrs/x/dispatcher"
+	. "github.com/screwyprof/cqrs/x/dispatcher/testdata/fixture"
 )
 
 // ensure that Dispatcher  implements cqrs.CommandHandler interface.

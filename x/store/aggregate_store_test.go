@@ -8,8 +8,8 @@ import (
 
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate"
-	"github.com/screwyprof/cqrs/store"
 	"github.com/screwyprof/cqrs/testdata/mock"
+	"github.com/screwyprof/cqrs/x/store"
 )
 
 // ensure that AggregateStore implements cqrs.AggregateStore interface.

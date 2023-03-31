@@ -8,18 +8,18 @@ import (
 
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate"
-	"github.com/screwyprof/cqrs/dispatcher"
-	"github.com/screwyprof/cqrs/eventbus"
-	"github.com/screwyprof/cqrs/eventhandler"
-	"github.com/screwyprof/cqrs/eventstore"
 	"github.com/screwyprof/cqrs/examples/bank/internal/reporting"
 	"github.com/screwyprof/cqrs/examples/bank/internal/ui"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/command"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/domain/account"
 	eh "github.com/screwyprof/cqrs/examples/bank/pkg/eventhandler"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/report"
-	"github.com/screwyprof/cqrs/store"
 	"github.com/screwyprof/cqrs/testdata/mock"
+	"github.com/screwyprof/cqrs/x/dispatcher"
+	"github.com/screwyprof/cqrs/x/eventbus"
+	"github.com/screwyprof/cqrs/x/eventhandler"
+	"github.com/screwyprof/cqrs/x/eventstore"
+	"github.com/screwyprof/cqrs/x/store"
 )
 
 func Example() {

@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/screwyprof/cqrs"
-	"github.com/screwyprof/cqrs/eventhandler"
 	"github.com/screwyprof/cqrs/testdata/mock"
+	"github.com/screwyprof/cqrs/x/eventhandler"
 )
 
 // ensure that event handler implements cqrs.EventHandler interface.

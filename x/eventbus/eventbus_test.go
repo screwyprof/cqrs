@@ -5,13 +5,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	cqrs2 "github.com/screwyprof/cqrs"
-	"github.com/screwyprof/cqrs/eventbus"
+	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/testdata/mock"
+	"github.com/screwyprof/cqrs/x/eventbus"
 )
 
 // ensure that EventBus implements cqrs.EventPublisher interface.
-var _ cqrs2.EventPublisher = (*eventbus.InMemoryEventBus)(nil)
+var _ cqrs.EventPublisher = (*eventbus.InMemoryEventBus)(nil)
 
 func TestNewInMemoryEventBus(t *testing.T) {
 	t.Run("ItCreatesNewInstance", func(t *testing.T) {
@@ -38,7 +38,7 @@ func TestInMemoryEventBus_Publish(t *testing.T) {
 
 	t.Run("ItPublishesEvents", func(t *testing.T) {
 		// arrange
-		want := []cqrs2.DomainEvent{mock.SomethingHappened{}, mock.SomethingElseHappened{}}
+		want := []cqrs.DomainEvent{mock.SomethingHappened{}, mock.SomethingElseHappened{}}
 		eventHandler := &mock.EventHandlerMock{}
 
 		b := eventbus.NewInMemoryEventBus()
@@ -54,16 +54,16 @@ func TestInMemoryEventBus_Publish(t *testing.T) {
 
 	t.Run("ItHandlesOnlyMatchedEvents", func(t *testing.T) {
 		// arrange
-		want := []cqrs2.DomainEvent{mock.SomethingHappened{}}
+		want := []cqrs.DomainEvent{mock.SomethingHappened{}}
 		eventHandler := &mock.EventHandlerMock{
-			Matcher: cqrs2.MatchEvent("SomethingHappened"),
+			Matcher: cqrs.MatchEvent("SomethingHappened"),
 		}
 
 		b := eventbus.NewInMemoryEventBus()
 		b.Register(eventHandler)
 
 		// act
-		err := b.Publish([]cqrs2.DomainEvent{
+		err := b.Publish([]cqrs.DomainEvent{
 			mock.SomethingHappened{},
 			mock.SomethingElseHappened{},
 		}...)
