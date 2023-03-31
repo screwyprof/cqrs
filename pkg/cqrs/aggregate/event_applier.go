@@ -63,6 +63,7 @@ func (a *EventApplier) apply(event cqrs.DomainEvent) error {
 	if !ok {
 		return fmt.Errorf("event applier for %s event is not found", applierID)
 	}
+
 	applier(event)
 
 	return nil

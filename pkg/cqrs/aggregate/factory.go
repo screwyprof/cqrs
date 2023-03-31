@@ -33,7 +33,7 @@ func (f *Factory) RegisterAggregate(factory cqrs.FactoryFn) {
 }
 
 // CreateAggregate creates an aggregate of a given type.
-func (f *Factory) CreateAggregate(aggregateType string, ID cqrs.Identifier) (cqrs.AdvancedAggregate, error) {
+func (f *Factory) CreateAggregate(aggregateType string, id cqrs.Identifier) (cqrs.AdvancedAggregate, error) {
 	f.factoriesMu.Lock()
 	defer f.factoriesMu.Unlock()
 
@@ -41,5 +41,6 @@ func (f *Factory) CreateAggregate(aggregateType string, ID cqrs.Identifier) (cqr
 	if !ok {
 		return nil, errors.New(aggregateType + " is not registered")
 	}
-	return factory(ID), nil
+
+	return factory(id), nil
 }

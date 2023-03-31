@@ -25,11 +25,12 @@ type AggregateTester func(given GivenFn, when WhenFn, then ThenFn)
 // Test runs the test.
 //
 // Example:
-//  Test(t)(
-//	  Given(agg),
-//	  When(testdata.TestCommand{Param: "param"}),
-//	  Then(testdata.TestEvent{Data: "param"}),
-//  )
+//
+//	 Test(t)(
+//		  Given(agg),
+//		  When(testdata.TestCommand{Param: "param"}),
+//		  Then(testdata.TestEvent{Data: "param"}),
+//	 )
 func Test(t *testing.T) AggregateTester {
 	return func(given GivenFn, when WhenFn, then ThenFn) {
 		t.Helper()

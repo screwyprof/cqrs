@@ -63,22 +63,23 @@ func (h *CommandHandler) methodHasValidSignature(method reflect.Method) bool {
 
 	// ensure that the method has a cqrs.Command as a parameter.
 	cmdIntfType := reflect.TypeOf((*cqrs.Command)(nil)).Elem()
-	cmdType := method.Type.In(1)
-	if !cmdType.Implements(cmdIntfType) {
-		return false
-	}
 
-	return true
+	cmdType := method.Type.In(1)
+
+	return cmdType.Implements(cmdIntfType)
 }
 
 func (h *CommandHandler) invokeCommandHandler(
-	method reflect.Method, aggregate cqrs.Aggregate, c cqrs.Command) ([]cqrs.DomainEvent, error) {
+	method reflect.Method, aggregate cqrs.Aggregate, c cqrs.Command,
+) ([]cqrs.DomainEvent, error) {
 	result := method.Func.Call([]reflect.Value{reflect.ValueOf(aggregate), reflect.ValueOf(c)})
+
 	resErr := result[1].Interface()
 	if resErr != nil {
 		return nil, resErr.(error)
 	}
 	eventsIntf := result[0].Interface()
+
 	events := h.convertDomainEvents(eventsIntf)
 	return events, nil
 }
@@ -86,7 +87,7 @@ func (h *CommandHandler) invokeCommandHandler(
 func (h *CommandHandler) convertDomainEvents(eventsIntf interface{}) []cqrs.DomainEvent {
 	eventsIntfs := h.interfaceSlice(eventsIntf)
 
-	var events []cqrs.DomainEvent
+	events := make([]cqrs.DomainEvent, 0, len(eventsIntfs))
 	for _, eventIntf := range eventsIntfs {
 		events = append(events, eventIntf.(cqrs.DomainEvent))
 	}
@@ -96,9 +97,6 @@ func (h *CommandHandler) convertDomainEvents(eventsIntf interface{}) []cqrs.Doma
 
 func (h *CommandHandler) interfaceSlice(slice interface{}) []interface{} {
 	s := reflect.ValueOf(slice)
-	//if s.Kind() != reflect.Slice {
-	//	panic("InterfaceSlice() given a non-slice type")
-	//}
 
 	ret := make([]interface{}, s.Len())
 	for i := 0; i < s.Len(); i++ {

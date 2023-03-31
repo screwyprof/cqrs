@@ -17,8 +17,15 @@ var _ cqrs.EventStore = (*eventstore.InMemoryEventStore)(nil)
 
 func TestNewInInMemoryEventStore(t *testing.T) {
 	t.Run("ItCreatesEventStore", func(t *testing.T) {
-		es := eventstore.NewInInMemoryEventStore()
+		es := eventstore.NewInInMemoryEventStore(createEventPublisherMock(nil))
 		assert.True(t, es != nil)
+	})
+
+	t.Run("ItPanicsIfEventPublisherIsNotGiven", func(t *testing.T) {
+		factory := func() {
+			eventstore.NewInInMemoryEventStore(nil)
+		}
+		assert.Panic(t, factory)
 	})
 }
 
@@ -26,7 +33,7 @@ func TestInMemoryEventStoreLoadEventsFor(t *testing.T) {
 	t.Run("ItLoadsEventsForTheGivenAggregate", func(t *testing.T) {
 		// arrange
 		ID := mock.StringIdentifier(faker.UUIDHyphenated())
-		es := eventstore.NewInInMemoryEventStore()
+		es := eventstore.NewInInMemoryEventStore(createEventPublisherMock(nil))
 
 		want := []cqrs.DomainEvent{mock.SomethingHappened{Data: faker.Word()}}
 
@@ -46,7 +53,7 @@ func TestInMemoryEventStoreStoreEventsFor(t *testing.T) {
 	t.Run("ItReturnsConcurrencyErrorIfVersionsAreNotTheSame", func(t *testing.T) {
 		// arrange
 		ID := mock.StringIdentifier(faker.UUIDHyphenated())
-		es := eventstore.NewInInMemoryEventStore()
+		es := eventstore.NewInInMemoryEventStore(createEventPublisherMock(nil))
 
 		// act
 		err := es.StoreEventsFor(ID, 1, []cqrs.DomainEvent{mock.SomethingHappened{}})
@@ -54,4 +61,14 @@ func TestInMemoryEventStoreStoreEventsFor(t *testing.T) {
 		// assert
 		assert.Equals(t, eventstore.ErrConcurrencyViolation, err)
 	})
+}
+
+func createEventPublisherMock(err error) *mock.EventPublisherMock {
+	eventPublisher := &mock.EventPublisherMock{
+		Publisher: func(e ...cqrs.DomainEvent) error {
+			return err
+		},
+	}
+
+	return eventPublisher
 }

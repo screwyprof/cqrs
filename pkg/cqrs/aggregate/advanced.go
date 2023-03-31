@@ -57,5 +57,6 @@ func (b *Advanced) Apply(e ...cqrs.DomainEvent) error {
 		return err
 	}
 	b.version += len(e)
+
 	return nil
 }

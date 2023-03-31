@@ -9,23 +9,17 @@ import "github.com/screwyprof/cqrs/pkg/cqrs"
 // at startup and keep it in memory.
 // Depends on some kind of event storage mechanism.
 type Dispatcher struct {
-	store          cqrs.AggregateStore
-	eventPublisher cqrs.EventPublisher
+	store cqrs.AggregateStore
 }
 
 // NewDispatcher creates a new instance of Dispatcher.
-func NewDispatcher(aggregateStore cqrs.AggregateStore, eventPublisher cqrs.EventPublisher) *Dispatcher {
+func NewDispatcher(aggregateStore cqrs.AggregateStore) *Dispatcher {
 	if aggregateStore == nil {
 		panic("aggregateStore is required")
 	}
 
-	if eventPublisher == nil {
-		panic("eventPublisher is required")
-	}
-
 	return &Dispatcher{
-		store:          aggregateStore,
-		eventPublisher: eventPublisher,
+		store: aggregateStore,
 	}
 }
 
@@ -41,24 +35,9 @@ func (d *Dispatcher) Handle(c cqrs.Command) ([]cqrs.DomainEvent, error) {
 		return nil, err
 	}
 
-	err = d.storeAndPublishEvents(agg, events...)
-	if err != nil {
+	if err = d.store.Store(agg, events...); err != nil {
 		return nil, err
 	}
 
 	return events, nil
-}
-
-func (d *Dispatcher) storeAndPublishEvents(aggregate cqrs.AdvancedAggregate, events ...cqrs.DomainEvent) error {
-	err := d.store.Store(aggregate, events...)
-	if err != nil {
-		return err
-	}
-
-	err = d.eventPublisher.Publish(events...)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

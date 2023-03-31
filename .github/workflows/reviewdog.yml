@@ -1,0 +1,21 @@
+name: reviewdog
+on:
+  push:
+    branches:
+      - main
+      - 'pr/*'
+  pull_request:
+jobs:
+  golangci-lint:
+    name: runner / golangci-lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: fetch master to compare against the latest revision
+        run: git fetch origin master && git branch master remotes/origin/master
+      - name: golangci-lint
+        uses: reviewdog/action-golangci-lint@v2
+        with:
+          level: error
+          fail_on_error: true

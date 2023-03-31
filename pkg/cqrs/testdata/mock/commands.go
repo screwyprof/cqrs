@@ -2,7 +2,7 @@ package mock
 
 import "github.com/screwyprof/cqrs/pkg/cqrs"
 
-type MakeSomethingHappen struct{
+type MakeSomethingHappen struct {
 	AggID cqrs.Identifier
 }
 
@@ -13,6 +13,7 @@ func (c MakeSomethingHappen) AggregateID() cqrs.Identifier {
 func (c MakeSomethingHappen) AggregateType() string {
 	return "mock.TestAggregate"
 }
+
 func (c MakeSomethingHappen) CommandType() string {
 	return "MakeSomethingHappen"
 }
