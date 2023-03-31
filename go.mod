@@ -1,9 +1,9 @@
 module github.com/screwyprof/cqrs
 
-go 1.19
+go 1.20
 
 require (
-	github.com/bxcodec/faker/v4 v4.0.0-beta.3
+	github.com/go-faker/faker/v4 v4.1.0
 	github.com/golangci/golangci-lint v1.52.2
 	github.com/stretchr/testify v1.8.2
 	mvdan.cc/gofumpt v0.4.0
