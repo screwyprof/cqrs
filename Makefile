@@ -1,3 +1,11 @@
+# This repo's root import path.
+PKG := gitlab.com/screwyprof/cqrs
+
+## DO NOT EDIT BELLOW THIS LINE
+GO_FILES = $(shell find . -name "*.go" | uniq)
+GO_PACKAGES = $(shell go list ./... | tr '\n', ',')
+LOCAL_PACKAGES="github.com/screwyprof/"
+
 OK_COLOR=\033[32;01m
 NO_COLOR=\033[0m
 MAKE_COLOR=\033[33;01m%-20s\033[0m
@@ -21,13 +29,15 @@ test: ## run  tests
 	go test -v --race --count=1 -coverprofile=coverage.out ./...
 
 coverage: test ## show test coverage report
-	@echo -e "$(OK_COLOR)--> Showing test coverage$(NO_COLOR)"
+	@echo "$(OK_COLOR)--> Showing test coverage$(NO_COLOR)"
 	go tool cover -func=coverage.out
 
 fmt: ## format go files
 	@echo "$(OK_COLOR)--> Formatting go files$(NO_COLOR)"
-	gofumpt -l -w .
-	go mod tidy
+	@go mod tidy
+	@go fmt ./...
+	@tools/bin/gofumpt -l -w .
+	@tools/bin/gci write $(GO_FILES) -s standard  -s default -s "prefix($(LOCAL_PACKAGES))"
 
 clean: ## remove tools
 	@echo "$(OK_COLOR)--> Clean up$(NO_COLOR)"

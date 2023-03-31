@@ -3,18 +3,17 @@ package account_test
 import (
 	"testing"
 
-	"github.com/bxcodec/faker/v4"
-
-	"github.com/screwyprof/cqrs/pkg/assert"
-	"github.com/screwyprof/cqrs/pkg/cqrs"
-	"github.com/screwyprof/cqrs/pkg/cqrs/aggregate"
-	. "github.com/screwyprof/cqrs/pkg/cqrs/aggregate/testdata/fixture"
-	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
+	"github.com/go-faker/faker/v4"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/screwyprof/cqrs/examples/bank/pkg/command"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/domain"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/domain/account"
 	"github.com/screwyprof/cqrs/examples/bank/pkg/event"
+	"github.com/screwyprof/cqrs/pkg/cqrs"
+	"github.com/screwyprof/cqrs/pkg/cqrs/aggregate"
+	. "github.com/screwyprof/cqrs/pkg/cqrs/aggregate/testdata/fixture"
+	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
 )
 
 // ensure that game aggregate implements cqrs.Aggregate interface.
@@ -25,7 +24,7 @@ func TestNewAggregate(t *testing.T) {
 		factory := func() {
 			account.NewAggregate(nil)
 		}
-		assert.Panic(t, factory)
+		assert.Panics(t, factory)
 	})
 }
 
@@ -34,7 +33,7 @@ func TestAggregateAggregateID(t *testing.T) {
 		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		agg := account.NewAggregate(ID)
 
-		assert.Equals(t, ID, agg.AggregateID())
+		assert.Equal(t, ID, agg.AggregateID())
 	})
 }
 
@@ -43,7 +42,7 @@ func TestAggregateAggregateType(t *testing.T) {
 		ID := mock.StringIdentifier(faker.UUIDHyphenated())
 		agg := account.NewAggregate(ID)
 
-		assert.Equals(t, "account.Aggregate", agg.AggregateType())
+		assert.Equal(t, "account.Aggregate", agg.AggregateType())
 	})
 }
 

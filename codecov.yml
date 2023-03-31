@@ -1,5 +1,5 @@
-ignore:
-- "pkg/assert"  # ignore folders and all its contents
+#ignore:
+#- "pkg/assert"  # ignore folders and all its contents
 
 coverage:
   status:

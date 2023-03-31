@@ -4,8 +4,14 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bxcodec/faker/v4"
+	"github.com/go-faker/faker/v4"
 
+	"github.com/screwyprof/cqrs/examples/bank/internal/reporting"
+	"github.com/screwyprof/cqrs/examples/bank/internal/ui"
+	"github.com/screwyprof/cqrs/examples/bank/pkg/command"
+	"github.com/screwyprof/cqrs/examples/bank/pkg/domain/account"
+	eh "github.com/screwyprof/cqrs/examples/bank/pkg/eventhandler"
+	"github.com/screwyprof/cqrs/examples/bank/pkg/report"
 	"github.com/screwyprof/cqrs/pkg/cqrs"
 	"github.com/screwyprof/cqrs/pkg/cqrs/aggregate"
 	"github.com/screwyprof/cqrs/pkg/cqrs/dispatcher"
@@ -14,14 +20,6 @@ import (
 	"github.com/screwyprof/cqrs/pkg/cqrs/eventstore"
 	"github.com/screwyprof/cqrs/pkg/cqrs/store"
 	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
-
-	"github.com/screwyprof/cqrs/examples/bank/internal/reporting"
-	"github.com/screwyprof/cqrs/examples/bank/internal/ui"
-
-	"github.com/screwyprof/cqrs/examples/bank/pkg/command"
-	"github.com/screwyprof/cqrs/examples/bank/pkg/domain/account"
-	eh "github.com/screwyprof/cqrs/examples/bank/pkg/eventhandler"
-	"github.com/screwyprof/cqrs/examples/bank/pkg/report"
 )
 
 func Example() {

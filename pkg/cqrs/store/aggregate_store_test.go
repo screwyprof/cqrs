@@ -3,9 +3,9 @@ package store_test
 import (
 	"testing"
 
-	"github.com/bxcodec/faker/v4"
+	"github.com/go-faker/faker/v4"
+	"github.com/stretchr/testify/assert"
 
-	"github.com/screwyprof/cqrs/pkg/assert"
 	"github.com/screwyprof/cqrs/pkg/cqrs"
 	"github.com/screwyprof/cqrs/pkg/cqrs/aggregate"
 	"github.com/screwyprof/cqrs/pkg/cqrs/store"
@@ -20,7 +20,7 @@ func TestNewStore(t *testing.T) {
 		factory := func() {
 			store.NewStore(nil, nil)
 		}
-		assert.Panic(t, factory)
+		assert.Panics(t, factory)
 	})
 
 	t.Run("ItPanicsIfAggregateFactoryIsNotGiven", func(t *testing.T) {
@@ -30,7 +30,7 @@ func TestNewStore(t *testing.T) {
 				nil,
 			)
 		}
-		assert.Panic(t, factory)
+		assert.Panics(t, factory)
 	})
 }
 
@@ -44,7 +44,7 @@ func TestAggregateStoreLoad(t *testing.T) {
 		_, err := s.Load(ID, mock.TestAggregateType)
 
 		// assert
-		assert.Equals(t, mock.ErrEventStoreCannotLoadEvents, err)
+		assert.Equal(t, mock.ErrEventStoreCannotLoadEvents, err)
 	})
 
 	t.Run("ItCannotCreateAggregate", func(t *testing.T) {
@@ -56,7 +56,7 @@ func TestAggregateStoreLoad(t *testing.T) {
 		_, err := s.Load(ID, mock.TestAggregateType)
 
 		// assert
-		assert.Equals(t, mock.ErrAggIsNotRegistered, err)
+		assert.Equal(t, mock.ErrAggIsNotRegistered, err)
 	})
 
 	t.Run("ItFailsIfItCannotApplyEvents", func(t *testing.T) {
@@ -72,7 +72,7 @@ func TestAggregateStoreLoad(t *testing.T) {
 		_, err := s.Load(ID, mock.TestAggregateType)
 
 		// assert
-		assert.Equals(t, mock.ErrOnSomethingHappenedApplierNotFound, err)
+		assert.Equal(t, mock.ErrOnSomethingHappenedApplierNotFound, err)
 	})
 
 	t.Run("ItReturnsAggregate", func(t *testing.T) {
@@ -84,7 +84,7 @@ func TestAggregateStoreLoad(t *testing.T) {
 		got, err := s.Load(ID, mock.TestAggregateType)
 
 		// assert
-		assert.Ok(t, err)
+		assert.NoError(t, err)
 		assert.True(t, nil != got)
 	})
 }
@@ -100,7 +100,7 @@ func TestAggregateStoreStore(t *testing.T) {
 		err := s.Store(agg, nil)
 
 		// assert
-		assert.Equals(t, mock.ErrEventStoreCannotStoreEvents, err)
+		assert.Equal(t, mock.ErrEventStoreCannotStoreEvents, err)
 	})
 }
 

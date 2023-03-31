@@ -3,7 +3,8 @@ package fixture
 import (
 	"testing"
 
-	"github.com/screwyprof/cqrs/pkg/assert"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/screwyprof/cqrs/pkg/cqrs"
 )
 
@@ -60,8 +61,8 @@ func Then(want ...cqrs.DomainEvent) ThenFn {
 	return func(t *testing.T) Checker {
 		return func(got []cqrs.DomainEvent, err error) {
 			t.Helper()
-			assert.Ok(t, err)
-			assert.Equals(t, want, got)
+			assert.NoError(t, err)
+			assert.Equal(t, want, got)
 		}
 	}
 }
@@ -71,7 +72,7 @@ func ThenFailWith(want error) ThenFn {
 	return func(t *testing.T) Checker {
 		return func(got []cqrs.DomainEvent, err error) {
 			t.Helper()
-			assert.Equals(t, want, err)
+			assert.Equal(t, want, err)
 		}
 	}
 }

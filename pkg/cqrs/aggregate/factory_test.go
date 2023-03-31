@@ -3,9 +3,9 @@ package aggregate_test
 import (
 	"testing"
 
-	"github.com/bxcodec/faker/v4"
+	"github.com/go-faker/faker/v4"
+	"github.com/stretchr/testify/assert"
 
-	"github.com/screwyprof/cqrs/pkg/assert"
 	"github.com/screwyprof/cqrs/pkg/cqrs"
 	"github.com/screwyprof/cqrs/pkg/cqrs/aggregate"
 	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
@@ -27,7 +27,7 @@ func TestFactoryCreateAggregate(t *testing.T) {
 
 		_, err := f.CreateAggregate(mock.TestAggregateType, mock.StringIdentifier(faker.UUIDHyphenated()))
 
-		assert.Equals(t, mock.ErrAggIsNotRegistered, err)
+		assert.Equal(t, mock.ErrAggIsNotRegistered, err)
 	})
 }
 
@@ -58,7 +58,7 @@ func TestFactoryRegisterAggregate(t *testing.T) {
 		newAgg, err := f.CreateAggregate(mock.TestAggregateType, ID)
 
 		// assert
-		assert.Ok(t, err)
-		assert.Equals(t, expected, newAgg)
+		assert.NoError(t, err)
+		assert.Equal(t, expected, newAgg)
 	})
 }
