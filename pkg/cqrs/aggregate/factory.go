@@ -41,5 +41,6 @@ func (f *Factory) CreateAggregate(aggregateType string, id cqrs.Identifier) (cqr
 	if !ok {
 		return nil, errors.New(aggregateType + " is not registered")
 	}
+
 	return factory(id), nil
 }

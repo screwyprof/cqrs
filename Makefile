@@ -7,7 +7,6 @@ all: tools lint test ## install tools, lint and test
 deps: ## install dependencies
 	@echo "$(OK_COLOR)--> Download go.mod dependencies$(NO_COLOR)"
 	go mod download
-	go mod vendor
 
 tools: ## install dev tools, linters, code generators, etc..
 	@echo "$(OK_COLOR)--> Installing tools from tools/tools.go$(NO_COLOR)"
@@ -17,19 +16,18 @@ lint: ## run linters
 	@echo "$(OK_COLOR)--> Running linters$(NO_COLOR)"
 	tools/bin/golangci-lint run
 
-test: test-unit ## run all tests
-
-test-unit: ## run unit tests
+test: ## run  tests
 	@echo "$(OK_COLOR)--> Running unit tests$(NO_COLOR)"
-	go test --race --count=1 ./...
+	go test -v --race --count=1 -coverprofile=coverage.out ./...
 
-test-coverage: ## run all tests with coverage
-	@echo "$(OK_COLOR)--> Generating code coverage$(NO_COLOR)"
-	tools/coverage.sh
+coverage: test ## show test coverage report
+	@echo -e "$(OK_COLOR)--> Showing test coverage$(NO_COLOR)"
+	go tool cover -func=coverage.out
 
 fmt: ## format go files
 	@echo "$(OK_COLOR)--> Formatting go files$(NO_COLOR)"
 	gofumpt -l -w .
+	go mod tidy
 
 clean: ## remove tools
 	@echo "$(OK_COLOR)--> Clean up$(NO_COLOR)"
@@ -42,4 +40,4 @@ help: ## show this help screen
 # To avoid unintended conflicts with file names, always add to .PHONY
 # unless there is a reason not to.
 # https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html
-.PHONY: all deps tools lint test test-unit test-coverage fmt clean help
+.PHONY: all deps tools lint test coverage fmt clean help

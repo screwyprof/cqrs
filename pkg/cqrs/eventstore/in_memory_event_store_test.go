@@ -69,5 +69,6 @@ func createEventPublisherMock(err error) *mock.EventPublisherMock {
 			return err
 		},
 	}
+
 	return eventPublisher
 }
