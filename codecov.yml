@@ -1,2 +1,16 @@
 ignore:
 - "pkg/assert"  # ignore folders and all its contents
+
+coverage:
+  status:
+    project:
+      default:
+        # basic
+        target: auto
+        threshold: 1%
+        # advanced settings
+        branches:
+          - master
+        if_ci_failed: error #success, failure, error, ignore
+        informational: false
+        only_pulls: false
