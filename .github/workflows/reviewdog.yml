@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: fetch master to compare against the latest revision
+        run: git fetch origin master && git branch master remotes/origin/master
       - name: golangci-lint
         uses: reviewdog/action-golangci-lint@v2
         with:
