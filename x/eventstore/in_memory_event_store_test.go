@@ -8,8 +8,8 @@ import (
 
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate/aggtest"
-	"github.com/screwyprof/cqrs/testdata/mock"
 	"github.com/screwyprof/cqrs/x/eventstore"
+	"github.com/screwyprof/cqrs/x/eventstore/evnstoretest"
 )
 
 // ensure that event store implements cqrs.EventStore interface.
@@ -63,8 +63,8 @@ func TestInMemoryEventStoreStoreEventsFor(t *testing.T) {
 	})
 }
 
-func createEventPublisherMock(err error) *mock.EventPublisherMock {
-	eventPublisher := &mock.EventPublisherMock{
+func createEventPublisherMock(err error) *evnstoretest.EventPublisherMock {
+	eventPublisher := &evnstoretest.EventPublisherMock{
 		Publisher: func(e ...cqrs.DomainEvent) error {
 			return err
 		},

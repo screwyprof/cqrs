@@ -1,13 +1,8 @@
-package mock
+package evnstoretest
 
 import (
-	"errors"
-
 	"github.com/screwyprof/cqrs"
 )
-
-// ErrCannotPublishEvents happens when event publisher cannot publish the given events.
-var ErrCannotPublishEvents = errors.New("cannot load aggregate")
 
 // EventPublisherMock mocks event store.
 type EventPublisherMock struct {
