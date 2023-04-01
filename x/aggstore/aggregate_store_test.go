@@ -1,4 +1,4 @@
-package store_test
+package aggstore_test
 
 import (
 	"testing"
@@ -9,24 +9,24 @@ import (
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate"
 	"github.com/screwyprof/cqrs/aggregate/aggtest"
-	"github.com/screwyprof/cqrs/testdata/mock"
-	"github.com/screwyprof/cqrs/x/store"
+	"github.com/screwyprof/cqrs/x/aggstore"
+	"github.com/screwyprof/cqrs/x/eventstore/evnstoretest"
 )
 
 // ensure that AggregateStore implements cqrs.AggregateStore interface.
-var _ cqrs.AggregateStore = (*store.AggregateStore)(nil)
+var _ cqrs.AggregateStore = (*aggstore.AggregateStore)(nil)
 
 func TestNewStore(t *testing.T) {
 	t.Run("ItPanicsIfEventStoreIsNotGiven", func(t *testing.T) {
 		factory := func() {
-			store.NewStore(nil, nil)
+			aggstore.NewStore(nil, nil)
 		}
 		assert.Panics(t, factory)
 	})
 
 	t.Run("ItPanicsIfAggregateFactoryIsNotGiven", func(t *testing.T) {
 		factory := func() {
-			store.NewStore(
+			aggstore.NewStore(
 				createEventStoreMock(nil, nil, nil),
 				nil,
 			)
@@ -39,13 +39,13 @@ func TestAggregateStoreLoad(t *testing.T) {
 	t.Run("ItFailsIfItCannotLoadEventsForAggregate", func(t *testing.T) {
 		// arrange
 		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
-		s := createAggregateStore(ID, withEventStoreLoadErr(mock.ErrEventStoreCannotLoadEvents))
+		s := createAggregateStore(ID, withEventStoreLoadErr(evnstoretest.ErrEventStoreCannotLoadEvents))
 
 		// act
 		_, err := s.Load(ID, aggtest.TestAggregateType)
 
 		// assert
-		assert.Equal(t, mock.ErrEventStoreCannotLoadEvents, err)
+		assert.Equal(t, evnstoretest.ErrEventStoreCannotLoadEvents, err)
 	})
 
 	t.Run("ItCannotCreateAggregate", func(t *testing.T) {
@@ -94,14 +94,14 @@ func TestAggregateStoreStore(t *testing.T) {
 	t.Run("ItFailsIfItCannotSafeEventsForAggregate", func(t *testing.T) {
 		// arrange
 		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
-		s := createAggregateStore(ID, withEventStoreSaveErr(mock.ErrEventStoreCannotStoreEvents))
+		s := createAggregateStore(ID, withEventStoreSaveErr(evnstoretest.ErrEventStoreCannotStoreEvents))
 		agg := createAgg(ID)
 
 		// act
 		err := s.Store(agg, nil)
 
 		// assert
-		assert.Equal(t, mock.ErrEventStoreCannotStoreEvents, err)
+		assert.Equal(t, evnstoretest.ErrEventStoreCannotStoreEvents, err)
 	})
 }
 
@@ -158,7 +158,7 @@ func withEventStoreSaveErr(err error) option {
 	}
 }
 
-func createAggregateStore(id cqrs.Identifier, opts ...option) *store.AggregateStore {
+func createAggregateStore(id cqrs.Identifier, opts ...option) *aggstore.AggregateStore {
 	config := &aggregateStoreOptions{}
 	for _, opt := range opts {
 		opt(config)
@@ -181,7 +181,7 @@ func createAggregateStore(id cqrs.Identifier, opts ...option) *store.AggregateSt
 	aggFactory := createAggFactory(agg, config.emptyFactory)
 	eventStore := createEventStoreMock(config.loadedEvents, config.loadErr, config.storeErr)
 
-	return store.NewStore(eventStore, aggFactory)
+	return aggstore.NewStore(eventStore, aggFactory)
 }
 
 func createAggFactory(agg *aggregate.Advanced, empty bool) *aggregate.Factory {
@@ -196,8 +196,8 @@ func createAggFactory(agg *aggregate.Advanced, empty bool) *aggregate.Factory {
 	return f
 }
 
-func createEventStoreMock(want []cqrs.DomainEvent, loadErr error, storeErr error) *mock.EventStoreMock {
-	eventStore := &mock.EventStoreMock{
+func createEventStoreMock(want []cqrs.DomainEvent, loadErr error, storeErr error) *evnstoretest.EventStoreMock {
+	eventStore := &evnstoretest.EventStoreMock{
 		Loader: func(aggregateID cqrs.Identifier) ([]cqrs.DomainEvent, error) {
 			return want, loadErr
 		},

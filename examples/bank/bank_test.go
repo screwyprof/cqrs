@@ -14,11 +14,11 @@ import (
 	eh "github.com/screwyprof/cqrs/examples/bank/eventhandler"
 	"github.com/screwyprof/cqrs/examples/bank/reporting"
 	"github.com/screwyprof/cqrs/examples/bank/ui"
+	"github.com/screwyprof/cqrs/x/aggstore"
 	"github.com/screwyprof/cqrs/x/dispatcher"
 	"github.com/screwyprof/cqrs/x/eventbus"
 	"github.com/screwyprof/cqrs/x/eventhandler"
 	"github.com/screwyprof/cqrs/x/eventstore"
-	"github.com/screwyprof/cqrs/x/store"
 )
 
 func Example() {
@@ -55,7 +55,7 @@ func createDispatcher(accountReporter eh.AccountReporting) *dispatcher.Dispatche
 	eventPublisher := eventbus.NewInMemoryEventBus()
 	eventPublisher.Register(accountDetailsProjector)
 
-	aggregateStore := store.NewStore(
+	aggregateStore := aggstore.NewStore(
 		eventstore.NewInInMemoryEventStore(eventPublisher),
 		aggregateFactory,
 	)

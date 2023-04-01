@@ -9,9 +9,9 @@ import (
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate"
 	"github.com/screwyprof/cqrs/aggregate/aggtest"
-	"github.com/screwyprof/cqrs/testdata/mock"
+	"github.com/screwyprof/cqrs/x/aggstore/aggstoretest"
 	"github.com/screwyprof/cqrs/x/dispatcher"
-	. "github.com/screwyprof/cqrs/x/dispatcher/testdata/fixture"
+	. "github.com/screwyprof/cqrs/x/dispatcher/testdsl"
 )
 
 // ensure that Dispatcher  implements cqrs.CommandHandler interface.
@@ -32,10 +32,10 @@ func TestNewDispatcherHandle(t *testing.T) {
 		Test(t)(
 			Given(createDispatcher(
 				ID,
-				withAggregateStoreLoadErr(mock.ErrAggregateStoreCannotLoadAggregate),
+				withAggregateStoreLoadErr(aggstoretest.ErrAggregateStoreCannotLoadAggregate),
 			)),
 			When(aggtest.MakeSomethingHappen{AggID: ID}),
-			ThenFailWith(mock.ErrAggregateStoreCannotLoadAggregate),
+			ThenFailWith(aggstoretest.ErrAggregateStoreCannotLoadAggregate),
 		)
 	})
 
@@ -56,10 +56,10 @@ func TestNewDispatcherHandle(t *testing.T) {
 		Test(t)(
 			Given(createDispatcher(
 				ID,
-				withAggregateStoreSaveErr(mock.ErrAggregateStoreCannotStoreAggregate),
+				withAggregateStoreSaveErr(aggstoretest.ErrAggregateStoreCannotStoreAggregate),
 			)),
 			When(aggtest.MakeSomethingHappen{AggID: ID}),
-			ThenFailWith(mock.ErrAggregateStoreCannotStoreAggregate),
+			ThenFailWith(aggstoretest.ErrAggregateStoreCannotStoreAggregate),
 		)
 	})
 
@@ -124,8 +124,10 @@ func createDispatcher(id cqrs.Identifier, opts ...option) *dispatcher.Dispatcher
 	)
 }
 
-func createAggregateStoreMock(want cqrs.AdvancedAggregate, loadErr error, storeErr error) *mock.AggregateStoreMock {
-	eventStore := &mock.AggregateStoreMock{
+func createAggregateStoreMock(
+	want cqrs.AdvancedAggregate, loadErr error, storeErr error,
+) *aggstoretest.AggregateStoreMock {
+	eventStore := &aggstoretest.AggregateStoreMock{
 		Loader: func(aggregateID cqrs.Identifier, aggregateType string) (cqrs.AdvancedAggregate, error) {
 			return want, loadErr
 		},

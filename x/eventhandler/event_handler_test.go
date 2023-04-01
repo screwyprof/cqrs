@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/screwyprof/cqrs"
-	"github.com/screwyprof/cqrs/aggregate/aggtest"
+	event "github.com/screwyprof/cqrs/aggregate/aggtest"
 	"github.com/screwyprof/cqrs/x/eventhandler"
 	"github.com/screwyprof/cqrs/x/eventhandler/evnhndtest"
 )
@@ -32,7 +32,7 @@ func TestEventHandlerHandle(t *testing.T) {
 		want := faker.Word()
 
 		// act
-		err := s.Handle(aggtest.SomethingHappened{Data: want})
+		err := s.Handle(event.SomethingHappened{Data: want})
 
 		// assert
 		assert.NoError(t, err)
@@ -44,7 +44,7 @@ func TestEventHandlerHandle(t *testing.T) {
 		s := eventhandler.New()
 
 		// act
-		err := s.Handle(aggtest.SomethingElseHappened{})
+		err := s.Handle(event.SomethingElseHappened{})
 
 		// assert
 		assert.Equal(t, evnhndtest.ErrEventHandlerNotFound, err)
@@ -58,7 +58,7 @@ func TestEventHandlerHandle(t *testing.T) {
 		s.RegisterHandlers(eh)
 
 		// act
-		err := s.Handle(aggtest.SomethingElseHappened{})
+		err := s.Handle(event.SomethingElseHappened{})
 
 		// assert
 		assert.Equal(t, evnhndtest.ErrCannotHandleEvent, err)
@@ -72,17 +72,17 @@ func TestEventHandlerSubscribedTo(t *testing.T) {
 
 		s := eventhandler.New()
 		s.RegisterHandler("OnSomethingHappened", func(e cqrs.DomainEvent) error {
-			return eh.OnSomethingHappened(e.(aggtest.SomethingHappened)) //nolint:forcetypeassert
+			return eh.OnSomethingHappened(e.(event.SomethingHappened)) //nolint:forcetypeassert
 		})
 		s.RegisterHandler("OnSomethingElseHappened", func(e cqrs.DomainEvent) error {
-			return eh.OnSomethingElseHappened(e.(aggtest.SomethingElseHappened)) //nolint:forcetypeassert
+			return eh.OnSomethingElseHappened(e.(event.SomethingElseHappened)) //nolint:forcetypeassert
 		})
 
 		// act
 		matcher := s.SubscribedTo()
 
 		// assert
-		assert.True(t, matcher(aggtest.SomethingHappened{}))
-		assert.True(t, matcher(aggtest.SomethingElseHappened{}))
+		assert.True(t, matcher(event.SomethingHappened{}))
+		assert.True(t, matcher(event.SomethingElseHappened{}))
 	})
 }

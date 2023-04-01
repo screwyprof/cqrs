@@ -1,4 +1,4 @@
-package mock
+package aggstoretest
 
 import (
 	"errors"
@@ -9,7 +9,7 @@ import (
 var (
 	// ErrAggregateStoreCannotLoadAggregate happens when aggregate store can't load aggregate.
 	ErrAggregateStoreCannotLoadAggregate = errors.New("cannot load aggregate")
-	// ErrAggregateStoreCannotStoreAggregate happens when aggregate store can't store aggregate.
+	// ErrAggregateStoreCannotStoreAggregate happens when aggregate store can't save aggregate.
 	ErrAggregateStoreCannotStoreAggregate = errors.New("cannot store aggregate")
 )
 

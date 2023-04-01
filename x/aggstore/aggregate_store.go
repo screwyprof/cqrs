@@ -1,4 +1,4 @@
-package store
+package aggstore
 
 import (
 	"github.com/screwyprof/cqrs"

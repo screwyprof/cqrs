@@ -1,3 +1,1 @@
-testdata/mock/*
-aggregate/testdata/fixture/*
-dispatcher/testdata/fixture/*
+**/*test
