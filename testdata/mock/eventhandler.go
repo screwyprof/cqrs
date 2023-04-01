@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	cqrs2 "github.com/screwyprof/cqrs"
+	"github.com/screwyprof/cqrs/aggregate/aggtest"
 )
 
 var (
@@ -15,12 +16,12 @@ type TestEventHandler struct {
 	SomethingHappened string
 }
 
-func (h *TestEventHandler) OnSomethingHappened(e SomethingHappened) error {
+func (h *TestEventHandler) OnSomethingHappened(e aggtest.SomethingHappened) error {
 	h.SomethingHappened = e.Data
 	return nil
 }
 
-func (h *TestEventHandler) OnSomethingElseHappened(e SomethingElseHappened) error {
+func (h *TestEventHandler) OnSomethingElseHappened(e aggtest.SomethingElseHappened) error {
 	return ErrCannotHandleEvent
 }
 
@@ -45,19 +46,19 @@ func (h *EventHandlerMock) Handle(event cqrs2.DomainEvent) error {
 		return h.Err
 	}
 	switch e := event.(type) {
-	case SomethingHappened:
+	case aggtest.SomethingHappened:
 		h.OnSomethingHappened(e)
-	case SomethingElseHappened:
+	case aggtest.SomethingElseHappened:
 		h.OnSomethingElseHappened(e)
 	}
 
 	return nil
 }
 
-func (h *EventHandlerMock) OnSomethingHappened(e SomethingHappened) {
+func (h *EventHandlerMock) OnSomethingHappened(e aggtest.SomethingHappened) {
 	h.Happened = append(h.Happened, e)
 }
 
-func (h *EventHandlerMock) OnSomethingElseHappened(e SomethingElseHappened) {
+func (h *EventHandlerMock) OnSomethingElseHappened(e aggtest.SomethingElseHappened) {
 	h.Happened = append(h.Happened, e)
 }

@@ -8,8 +8,8 @@ import (
 
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate"
-	. "github.com/screwyprof/cqrs/aggregate/testdata/fixture"
-	. "github.com/screwyprof/cqrs/testdata/mock"
+	. "github.com/screwyprof/cqrs/aggregate/aggtest"
+	. "github.com/screwyprof/cqrs/aggregate/aggtest/testdsl"
 )
 
 // ensure that Advanced implements cqrs.AdvancedAggregate interface.

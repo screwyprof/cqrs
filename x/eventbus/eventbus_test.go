@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/screwyprof/cqrs"
+	"github.com/screwyprof/cqrs/aggregate/aggtest"
 	"github.com/screwyprof/cqrs/testdata/mock"
 	"github.com/screwyprof/cqrs/x/eventbus"
 )
@@ -30,7 +31,7 @@ func TestInMemoryEventBus_Publish(t *testing.T) {
 		b.Register(eventHandler)
 
 		// act
-		err := b.Publish(mock.SomethingHappened{}, mock.SomethingElseHappened{})
+		err := b.Publish(aggtest.SomethingHappened{}, aggtest.SomethingElseHappened{})
 
 		// assert
 		assert.Equal(t, mock.ErrCannotHandleEvent, err)
@@ -38,14 +39,14 @@ func TestInMemoryEventBus_Publish(t *testing.T) {
 
 	t.Run("ItPublishesEvents", func(t *testing.T) {
 		// arrange
-		want := []cqrs.DomainEvent{mock.SomethingHappened{}, mock.SomethingElseHappened{}}
+		want := []cqrs.DomainEvent{aggtest.SomethingHappened{}, aggtest.SomethingElseHappened{}}
 		eventHandler := &mock.EventHandlerMock{}
 
 		b := eventbus.NewInMemoryEventBus()
 		b.Register(eventHandler)
 
 		// act
-		err := b.Publish(mock.SomethingHappened{}, mock.SomethingElseHappened{})
+		err := b.Publish(aggtest.SomethingHappened{}, aggtest.SomethingElseHappened{})
 
 		// assert
 		assert.NoError(t, err)
@@ -54,7 +55,7 @@ func TestInMemoryEventBus_Publish(t *testing.T) {
 
 	t.Run("ItHandlesOnlyMatchedEvents", func(t *testing.T) {
 		// arrange
-		want := []cqrs.DomainEvent{mock.SomethingHappened{}}
+		want := []cqrs.DomainEvent{aggtest.SomethingHappened{}}
 		eventHandler := &mock.EventHandlerMock{
 			Matcher: cqrs.MatchEvent("SomethingHappened"),
 		}
@@ -64,8 +65,8 @@ func TestInMemoryEventBus_Publish(t *testing.T) {
 
 		// act
 		err := b.Publish([]cqrs.DomainEvent{
-			mock.SomethingHappened{},
-			mock.SomethingElseHappened{},
+			aggtest.SomethingHappened{},
+			aggtest.SomethingElseHappened{},
 		}...)
 
 		// assert

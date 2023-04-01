@@ -8,6 +8,7 @@ import (
 
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate"
+	"github.com/screwyprof/cqrs/aggregate/aggtest"
 	"github.com/screwyprof/cqrs/testdata/mock"
 	"github.com/screwyprof/cqrs/x/store"
 )
@@ -37,11 +38,11 @@ func TestNewStore(t *testing.T) {
 func TestAggregateStoreLoad(t *testing.T) {
 	t.Run("ItFailsIfItCannotLoadEventsForAggregate", func(t *testing.T) {
 		// arrange
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		s := createAggregateStore(ID, withEventStoreLoadErr(mock.ErrEventStoreCannotLoadEvents))
 
 		// act
-		_, err := s.Load(ID, mock.TestAggregateType)
+		_, err := s.Load(ID, aggtest.TestAggregateType)
 
 		// assert
 		assert.Equal(t, mock.ErrEventStoreCannotLoadEvents, err)
@@ -49,39 +50,39 @@ func TestAggregateStoreLoad(t *testing.T) {
 
 	t.Run("ItCannotCreateAggregate", func(t *testing.T) {
 		// arrange
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		s := createAggregateStore(ID, withEmptyFactory())
 
 		// act
-		_, err := s.Load(ID, mock.TestAggregateType)
+		_, err := s.Load(ID, aggtest.TestAggregateType)
 
 		// assert
-		assert.Equal(t, mock.ErrAggIsNotRegistered, err)
+		assert.Equal(t, aggtest.ErrAggIsNotRegistered, err)
 	})
 
 	t.Run("ItFailsIfItCannotApplyEvents", func(t *testing.T) {
 		// arrange
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		s := createAggregateStore(
 			ID,
-			withLoadedEvents([]cqrs.DomainEvent{mock.SomethingHappened{}}),
+			withLoadedEvents([]cqrs.DomainEvent{aggtest.SomethingHappened{}}),
 			withStaticEventApplier(),
 		)
 
 		// act
-		_, err := s.Load(ID, mock.TestAggregateType)
+		_, err := s.Load(ID, aggtest.TestAggregateType)
 
 		// assert
-		assert.Equal(t, mock.ErrOnSomethingHappenedApplierNotFound, err)
+		assert.Equal(t, aggtest.ErrOnSomethingHappenedApplierNotFound, err)
 	})
 
 	t.Run("ItReturnsAggregate", func(t *testing.T) {
 		// arrange
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		s := createAggregateStore(ID)
 
 		// act
-		got, err := s.Load(ID, mock.TestAggregateType)
+		got, err := s.Load(ID, aggtest.TestAggregateType)
 
 		// assert
 		assert.NoError(t, err)
@@ -92,7 +93,7 @@ func TestAggregateStoreLoad(t *testing.T) {
 func TestAggregateStoreStore(t *testing.T) {
 	t.Run("ItFailsIfItCannotSafeEventsForAggregate", func(t *testing.T) {
 		// arrange
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		s := createAggregateStore(ID, withEventStoreSaveErr(mock.ErrEventStoreCannotStoreEvents))
 		agg := createAgg(ID)
 
@@ -105,7 +106,7 @@ func TestAggregateStoreStore(t *testing.T) {
 }
 
 func createAgg(id cqrs.Identifier) *aggregate.Advanced {
-	pureAgg := mock.NewTestAggregate(id)
+	pureAgg := aggtest.NewTestAggregate(id)
 
 	commandHandler := aggregate.NewCommandHandler()
 	commandHandler.RegisterHandlers(pureAgg)
@@ -163,7 +164,7 @@ func createAggregateStore(id cqrs.Identifier, opts ...option) *store.AggregateSt
 		opt(config)
 	}
 
-	pureAgg := mock.NewTestAggregate(id)
+	pureAgg := aggtest.NewTestAggregate(id)
 
 	applier := aggregate.NewEventApplier()
 	if !config.staticEventApplier {

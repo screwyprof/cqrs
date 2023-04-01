@@ -8,6 +8,7 @@ import (
 
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate"
+	"github.com/screwyprof/cqrs/aggregate/aggtest"
 	"github.com/screwyprof/cqrs/testdata/mock"
 	"github.com/screwyprof/cqrs/x/dispatcher"
 	. "github.com/screwyprof/cqrs/x/dispatcher/testdata/fixture"
@@ -27,47 +28,47 @@ func TestNewDispatcher(t *testing.T) {
 
 func TestNewDispatcherHandle(t *testing.T) {
 	t.Run("ItFailsIfItCannotLoadAggregate", func(t *testing.T) {
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		Test(t)(
 			Given(createDispatcher(
 				ID,
 				withAggregateStoreLoadErr(mock.ErrAggregateStoreCannotLoadAggregate),
 			)),
-			When(mock.MakeSomethingHappen{AggID: ID}),
+			When(aggtest.MakeSomethingHappen{AggID: ID}),
 			ThenFailWith(mock.ErrAggregateStoreCannotLoadAggregate),
 		)
 	})
 
 	t.Run("ItFailsIfAggregateCannotHandleTheGivenCommand", func(t *testing.T) {
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		Test(t)(
 			Given(createDispatcher(
 				ID,
-				withLoadedEvents([]cqrs.DomainEvent{mock.SomethingHappened{}}),
+				withLoadedEvents([]cqrs.DomainEvent{aggtest.SomethingHappened{}}),
 			)),
-			When(mock.MakeSomethingHappen{AggID: ID}),
-			ThenFailWith(mock.ErrItCanHappenOnceOnly),
+			When(aggtest.MakeSomethingHappen{AggID: ID}),
+			ThenFailWith(aggtest.ErrItCanHappenOnceOnly),
 		)
 	})
 
 	t.Run("ItFailsIfItCannotStoreAggregate", func(t *testing.T) {
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		Test(t)(
 			Given(createDispatcher(
 				ID,
 				withAggregateStoreSaveErr(mock.ErrAggregateStoreCannotStoreAggregate),
 			)),
-			When(mock.MakeSomethingHappen{AggID: ID}),
+			When(aggtest.MakeSomethingHappen{AggID: ID}),
 			ThenFailWith(mock.ErrAggregateStoreCannotStoreAggregate),
 		)
 	})
 
 	t.Run("ItReturnsEvents", func(t *testing.T) {
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		Test(t)(
 			Given(createDispatcher(ID)),
-			When(mock.MakeSomethingHappen{AggID: ID}),
-			Then(mock.SomethingHappened{}),
+			When(aggtest.MakeSomethingHappen{AggID: ID}),
+			Then(aggtest.SomethingHappened{}),
 		)
 	})
 }
@@ -105,7 +106,7 @@ func createDispatcher(id cqrs.Identifier, opts ...option) *dispatcher.Dispatcher
 		opt(config)
 	}
 
-	pureAgg := mock.NewTestAggregate(id)
+	pureAgg := aggtest.NewTestAggregate(id)
 
 	commandHandler := aggregate.NewCommandHandler()
 	commandHandler.RegisterHandlers(pureAgg)

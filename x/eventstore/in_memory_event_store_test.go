@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/screwyprof/cqrs"
+	"github.com/screwyprof/cqrs/aggregate/aggtest"
 	"github.com/screwyprof/cqrs/testdata/mock"
 	"github.com/screwyprof/cqrs/x/eventstore"
 )
@@ -31,10 +32,10 @@ func TestNewInInMemoryEventStore(t *testing.T) {
 func TestInMemoryEventStoreLoadEventsFor(t *testing.T) {
 	t.Run("ItLoadsEventsForTheGivenAggregate", func(t *testing.T) {
 		// arrange
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		es := eventstore.NewInInMemoryEventStore(createEventPublisherMock(nil))
 
-		want := []cqrs.DomainEvent{mock.SomethingHappened{Data: faker.Word()}}
+		want := []cqrs.DomainEvent{aggtest.SomethingHappened{Data: faker.Word()}}
 
 		err := es.StoreEventsFor(ID, 0, want)
 		assert.NoError(t, err)
@@ -51,11 +52,11 @@ func TestInMemoryEventStoreLoadEventsFor(t *testing.T) {
 func TestInMemoryEventStoreStoreEventsFor(t *testing.T) {
 	t.Run("ItReturnsConcurrencyErrorIfVersionsAreNotTheSame", func(t *testing.T) {
 		// arrange
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		es := eventstore.NewInInMemoryEventStore(createEventPublisherMock(nil))
 
 		// act
-		err := es.StoreEventsFor(ID, 1, []cqrs.DomainEvent{mock.SomethingHappened{}})
+		err := es.StoreEventsFor(ID, 1, []cqrs.DomainEvent{aggtest.SomethingHappened{}})
 
 		// assert
 		assert.Equal(t, eventstore.ErrConcurrencyViolation, err)

@@ -7,7 +7,7 @@ import (
 	"github.com/go-faker/faker/v4"
 
 	"github.com/screwyprof/cqrs"
-	"github.com/screwyprof/cqrs/testdata/mock"
+	"github.com/screwyprof/cqrs/aggregate/aggtest"
 )
 
 // Factory handles aggregate creation.
@@ -28,7 +28,7 @@ func (f *Factory) RegisterAggregate(factory cqrs.FactoryFn) {
 	f.factoriesMu.Lock()
 	defer f.factoriesMu.Unlock()
 
-	agg := factory(mock.StringIdentifier(faker.UUIDHyphenated()))
+	agg := factory(aggtest.StringIdentifier(faker.UUIDHyphenated()))
 	f.factories[agg.AggregateType()] = factory
 }
 

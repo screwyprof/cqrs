@@ -1,4 +1,4 @@
-package mock
+package aggtest
 
 type SomethingHappened struct {
 	Data string

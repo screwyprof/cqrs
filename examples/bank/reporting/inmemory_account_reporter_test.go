@@ -6,9 +6,9 @@ import (
 	"github.com/go-faker/faker/v4"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/screwyprof/cqrs/aggregate/aggtest"
 	"github.com/screwyprof/cqrs/examples/bank/report"
 	"github.com/screwyprof/cqrs/examples/bank/reporting"
-	"github.com/screwyprof/cqrs/testdata/mock"
 )
 
 func TestNewInMemoryAccountReporter(t *testing.T) {
@@ -19,7 +19,7 @@ func TestNewInMemoryAccountReporter(t *testing.T) {
 
 func TestInMemoryAccountReporter(t *testing.T) {
 	t.Run("ItShouldGetAccountDetailsForAGivenReportID", func(t *testing.T) {
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		accountReporter := reporting.NewInMemoryAccountReporter()
 
 		want := &report.Account{
@@ -47,7 +47,7 @@ func TestInMemoryAccountReporter(t *testing.T) {
 	})
 
 	t.Run("ItShouldReturnAccountNotFoundErrIfTheGivenAccountIsNotFound", func(t *testing.T) {
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		accountReporter := reporting.NewInMemoryAccountReporter()
 
 		_, err := accountReporter.AccountDetailsFor(ID)

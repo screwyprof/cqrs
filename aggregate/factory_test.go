@@ -8,7 +8,7 @@ import (
 
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate"
-	"github.com/screwyprof/cqrs/testdata/mock"
+	"github.com/screwyprof/cqrs/aggregate/aggtest"
 )
 
 // ensure that factory implements cqrs.AggregateFactory interface.
@@ -25,17 +25,17 @@ func TestFactoryCreateAggregate(t *testing.T) {
 	t.Run("ItPanicsIfTheAggregateIsNotRegistered", func(t *testing.T) {
 		f := aggregate.NewFactory()
 
-		_, err := f.CreateAggregate(mock.TestAggregateType, mock.StringIdentifier(faker.UUIDHyphenated()))
+		_, err := f.CreateAggregate(aggtest.TestAggregateType, aggtest.StringIdentifier(faker.UUIDHyphenated()))
 
-		assert.Equal(t, mock.ErrAggIsNotRegistered, err)
+		assert.Equal(t, aggtest.ErrAggIsNotRegistered, err)
 	})
 }
 
 func TestFactoryRegisterAggregate(t *testing.T) {
 	t.Run("ItRegistersAnAggregateFactory", func(t *testing.T) {
 		// arrange
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
-		agg := mock.NewTestAggregate(ID)
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
+		agg := aggtest.NewTestAggregate(ID)
 
 		commandHandler := aggregate.NewCommandHandler()
 		commandHandler.RegisterHandlers(agg)
@@ -55,7 +55,7 @@ func TestFactoryRegisterAggregate(t *testing.T) {
 		f.RegisterAggregate(func(ID cqrs.Identifier) cqrs.AdvancedAggregate {
 			return expected
 		})
-		newAgg, err := f.CreateAggregate(mock.TestAggregateType, ID)
+		newAgg, err := f.CreateAggregate(aggtest.TestAggregateType, ID)
 
 		// assert
 		assert.NoError(t, err)

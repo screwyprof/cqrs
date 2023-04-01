@@ -8,12 +8,12 @@ import (
 
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate"
-	. "github.com/screwyprof/cqrs/aggregate/testdata/fixture"
+	"github.com/screwyprof/cqrs/aggregate/aggtest"
+	. "github.com/screwyprof/cqrs/aggregate/aggtest/testdsl"
 	"github.com/screwyprof/cqrs/examples/bank/domain"
 	"github.com/screwyprof/cqrs/examples/bank/domain/account"
 	"github.com/screwyprof/cqrs/examples/bank/domain/command"
 	"github.com/screwyprof/cqrs/examples/bank/domain/event"
-	"github.com/screwyprof/cqrs/testdata/mock"
 )
 
 // ensure that game aggregate implements cqrs.Aggregate interface.
@@ -30,7 +30,7 @@ func TestNewAggregate(t *testing.T) {
 
 func TestAggregateAggregateID(t *testing.T) {
 	t.Run("ItReturnsAggregateID", func(t *testing.T) {
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		agg := account.NewAggregate(ID)
 
 		assert.Equal(t, ID, agg.AggregateID())
@@ -39,7 +39,7 @@ func TestAggregateAggregateID(t *testing.T) {
 
 func TestAggregateAggregateType(t *testing.T) {
 	t.Run("ItReturnsAggregateType", func(t *testing.T) {
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		agg := account.NewAggregate(ID)
 
 		assert.Equal(t, "account.Aggregate", agg.AggregateType())
@@ -48,7 +48,7 @@ func TestAggregateAggregateType(t *testing.T) {
 
 func TestAggregate(t *testing.T) {
 	t.Run("ItOpensAnAccount", func(t *testing.T) {
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		number := faker.Word()
 
 		Test(t)(
@@ -59,7 +59,7 @@ func TestAggregate(t *testing.T) {
 	})
 
 	t.Run("ItDepositsAnEmptyAccount", func(t *testing.T) {
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		number := faker.Word()
 		amount := faker.UnixTime()
 
@@ -71,7 +71,7 @@ func TestAggregate(t *testing.T) {
 	})
 
 	t.Run("ItDepositsAnAccountWithInitialFunds", func(t *testing.T) {
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		number := faker.Word()
 
 		currentBalance := faker.UnixTime()
@@ -89,7 +89,7 @@ func TestAggregate(t *testing.T) {
 	})
 
 	t.Run("ItWithdrawsSomeFunds", func(t *testing.T) {
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		number := faker.Word()
 
 		currentBalance := faker.UnixTime()
@@ -106,7 +106,7 @@ func TestAggregate(t *testing.T) {
 	})
 
 	t.Run("ItCannotWithdrawMoneyIfBalanceIsNotHighEnough", func(t *testing.T) {
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		number := faker.Word()
 		amount := faker.UnixTime()
 

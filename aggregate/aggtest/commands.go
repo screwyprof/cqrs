@@ -1,4 +1,4 @@
-package mock
+package aggtest
 
 import (
 	"github.com/screwyprof/cqrs"

@@ -8,12 +8,12 @@ import (
 
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate"
+	"github.com/screwyprof/cqrs/aggregate/aggtest"
 	"github.com/screwyprof/cqrs/examples/bank/domain/account"
 	"github.com/screwyprof/cqrs/examples/bank/domain/command"
 	eh "github.com/screwyprof/cqrs/examples/bank/eventhandler"
 	"github.com/screwyprof/cqrs/examples/bank/reporting"
 	"github.com/screwyprof/cqrs/examples/bank/ui"
-	"github.com/screwyprof/cqrs/testdata/mock"
 	"github.com/screwyprof/cqrs/x/dispatcher"
 	"github.com/screwyprof/cqrs/x/eventbus"
 	"github.com/screwyprof/cqrs/x/eventhandler"
@@ -22,7 +22,7 @@ import (
 )
 
 func Example() {
-	ID := mock.StringIdentifier(faker.UUIDHyphenated())
+	ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 	AccNumber := "ACC777"
 
 	accountReporter := reporting.NewInMemoryAccountReporter()

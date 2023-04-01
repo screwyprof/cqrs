@@ -8,10 +8,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	m "github.com/stretchr/testify/mock"
 
+	"github.com/screwyprof/cqrs/aggregate/aggtest"
 	"github.com/screwyprof/cqrs/examples/bank/domain/event"
 	eh "github.com/screwyprof/cqrs/examples/bank/eventhandler"
 	"github.com/screwyprof/cqrs/examples/bank/report"
-	"github.com/screwyprof/cqrs/testdata/mock"
 	"github.com/screwyprof/cqrs/x/eventhandler"
 )
 
@@ -32,7 +32,7 @@ func TestNewAccountDetailsProjector(t *testing.T) {
 func TestAccountDetailsProjector(t *testing.T) {
 	t.Run("ItProjectsAccountOpenedEvent", func(t *testing.T) {
 		// arrange
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		number := faker.Word()
 
 		want := &report.Account{
@@ -56,7 +56,7 @@ func TestAccountDetailsProjector(t *testing.T) {
 
 	t.Run("ItProjectsMoneyDepositedEvent", func(t *testing.T) {
 		// arrange
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		amount := faker.UnixTime()
 		balance := faker.UnixTime()
 
@@ -80,7 +80,7 @@ func TestAccountDetailsProjector(t *testing.T) {
 
 	t.Run("ItReturnsAnErrorWhenItCannotProjectMoneyDepositedEvent", func(t *testing.T) {
 		// arrange
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		want := errors.New("an error occurred")
 
 		accountReporter := createAccountReporterMockWithError(ID, want)
@@ -99,7 +99,7 @@ func TestAccountDetailsProjector(t *testing.T) {
 
 	t.Run("ItProjectsMoneyWithdrawnEvent", func(t *testing.T) {
 		// arrange
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		amount := faker.UnixTime()
 		balance := faker.UnixTime()
 
@@ -123,7 +123,7 @@ func TestAccountDetailsProjector(t *testing.T) {
 
 	t.Run("ItReturnsAnErrorWhenItCannotProjectMoneyWithdrawnEvent", func(t *testing.T) {
 		// arrange
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		want := errors.New("an error occurred")
 
 		accountReporter := createAccountReporterMockWithError(ID, want)

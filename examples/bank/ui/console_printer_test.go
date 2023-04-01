@@ -9,9 +9,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	m "github.com/stretchr/testify/mock"
 
+	"github.com/screwyprof/cqrs/aggregate/aggtest"
 	"github.com/screwyprof/cqrs/examples/bank/report"
 	"github.com/screwyprof/cqrs/examples/bank/ui"
-	"github.com/screwyprof/cqrs/testdata/mock"
 )
 
 func TestNewConsolePrinter(t *testing.T) {
@@ -33,7 +33,7 @@ func TestNewConsolePrinter(t *testing.T) {
 func TestConsolePrinter_PrintAccountStatement(t *testing.T) {
 	t.Run("ItPrintsDetailedAccountStatement", func(t *testing.T) {
 		// arrange
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 
 		accReport := &report.Account{
 			ID:      ID,
@@ -87,7 +87,7 @@ func TestConsolePrinter_PrintAccountStatement(t *testing.T) {
 
 	t.Run("ItReturnsAnErrorIfItCannotPrintAccountStatement", func(t *testing.T) {
 		// arrange
-		ID := mock.StringIdentifier(faker.UUIDHyphenated())
+		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 
 		want := fmt.Errorf("some error occured")
 
