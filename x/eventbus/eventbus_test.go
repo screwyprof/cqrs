@@ -7,8 +7,8 @@ import (
 
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate/aggtest"
-	"github.com/screwyprof/cqrs/testdata/mock"
 	"github.com/screwyprof/cqrs/x/eventbus"
+	"github.com/screwyprof/cqrs/x/eventhandler/evnhndtest"
 )
 
 // ensure that EventBus implements cqrs.EventPublisher interface.
@@ -23,8 +23,8 @@ func TestNewInMemoryEventBus(t *testing.T) {
 func TestInMemoryEventBus_Publish(t *testing.T) {
 	t.Run("ItFailsIfItCannotHandleAnEvent", func(t *testing.T) {
 		// arrange
-		eventHandler := &mock.EventHandlerMock{
-			Err: mock.ErrCannotHandleEvent,
+		eventHandler := &evnhndtest.EventHandlerMock{
+			Err: evnhndtest.ErrCannotHandleEvent,
 		}
 
 		b := eventbus.NewInMemoryEventBus()
@@ -34,13 +34,13 @@ func TestInMemoryEventBus_Publish(t *testing.T) {
 		err := b.Publish(aggtest.SomethingHappened{}, aggtest.SomethingElseHappened{})
 
 		// assert
-		assert.Equal(t, mock.ErrCannotHandleEvent, err)
+		assert.Equal(t, evnhndtest.ErrCannotHandleEvent, err)
 	})
 
 	t.Run("ItPublishesEvents", func(t *testing.T) {
 		// arrange
 		want := []cqrs.DomainEvent{aggtest.SomethingHappened{}, aggtest.SomethingElseHappened{}}
-		eventHandler := &mock.EventHandlerMock{}
+		eventHandler := &evnhndtest.EventHandlerMock{}
 
 		b := eventbus.NewInMemoryEventBus()
 		b.Register(eventHandler)
@@ -56,7 +56,7 @@ func TestInMemoryEventBus_Publish(t *testing.T) {
 	t.Run("ItHandlesOnlyMatchedEvents", func(t *testing.T) {
 		// arrange
 		want := []cqrs.DomainEvent{aggtest.SomethingHappened{}}
-		eventHandler := &mock.EventHandlerMock{
+		eventHandler := &evnhndtest.EventHandlerMock{
 			Matcher: cqrs.MatchEvent("SomethingHappened"),
 		}
 

@@ -8,8 +8,8 @@ import (
 
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate/aggtest"
-	"github.com/screwyprof/cqrs/testdata/mock"
 	"github.com/screwyprof/cqrs/x/eventhandler"
+	"github.com/screwyprof/cqrs/x/eventhandler/evnhndtest"
 )
 
 // ensure that event handler implements cqrs.EventHandler interface.
@@ -24,7 +24,7 @@ func TestNew(t *testing.T) {
 func TestEventHandlerHandle(t *testing.T) {
 	t.Run("ItHandlesTheGivenEvent", func(t *testing.T) {
 		// arrange
-		eh := &mock.TestEventHandler{}
+		eh := &evnhndtest.TestEventHandler{}
 
 		s := eventhandler.New()
 		s.RegisterHandlers(eh)
@@ -47,12 +47,12 @@ func TestEventHandlerHandle(t *testing.T) {
 		err := s.Handle(aggtest.SomethingElseHappened{})
 
 		// assert
-		assert.Equal(t, mock.ErrEventHandlerNotFound, err)
+		assert.Equal(t, evnhndtest.ErrEventHandlerNotFound, err)
 	})
 
 	t.Run("ItFailsIfEventHandlerReturnsAnError", func(t *testing.T) {
 		// arrange
-		eh := &mock.TestEventHandler{}
+		eh := &evnhndtest.TestEventHandler{}
 
 		s := eventhandler.New()
 		s.RegisterHandlers(eh)
@@ -61,14 +61,14 @@ func TestEventHandlerHandle(t *testing.T) {
 		err := s.Handle(aggtest.SomethingElseHappened{})
 
 		// assert
-		assert.Equal(t, mock.ErrCannotHandleEvent, err)
+		assert.Equal(t, evnhndtest.ErrCannotHandleEvent, err)
 	})
 }
 
 func TestEventHandlerSubscribedTo(t *testing.T) {
 	t.Run("ItReturnersTheEventsItSubscribedTo", func(t *testing.T) {
 		// arrange
-		eh := &mock.TestEventHandler{}
+		eh := &evnhndtest.TestEventHandler{}
 
 		s := eventhandler.New()
 		s.RegisterHandler("OnSomethingHappened", func(e cqrs.DomainEvent) error {
