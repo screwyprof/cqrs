@@ -114,7 +114,7 @@ func createDispatcher(id cqrs.Identifier, opts ...option) *dispatcher.Dispatcher
 	eventApplier := aggregate.NewEventApplier()
 	eventApplier.RegisterAppliers(pureAgg)
 
-	agg := aggregate.NewAdvanced(pureAgg, commandHandler, eventApplier)
+	agg := aggregate.New(pureAgg, commandHandler, eventApplier)
 	if config.loadedEvents != nil {
 		_ = agg.Apply(config.loadedEvents...)
 	}
@@ -125,13 +125,13 @@ func createDispatcher(id cqrs.Identifier, opts ...option) *dispatcher.Dispatcher
 }
 
 func createAggregateStoreMock(
-	want cqrs.AdvancedAggregate, loadErr error, storeErr error,
+	want cqrs.ESAggregate, loadErr error, storeErr error,
 ) *aggstoretest.AggregateStoreMock {
 	eventStore := &aggstoretest.AggregateStoreMock{
-		Loader: func(aggregateID cqrs.Identifier, aggregateType string) (cqrs.AdvancedAggregate, error) {
+		Loader: func(aggregateID cqrs.Identifier, aggregateType string) (cqrs.ESAggregate, error) {
 			return want, loadErr
 		},
-		Saver: func(aggregate cqrs.AdvancedAggregate, events ...cqrs.DomainEvent) error {
+		Saver: func(aggregate cqrs.ESAggregate, events ...cqrs.DomainEvent) error {
 			return storeErr
 		},
 	}

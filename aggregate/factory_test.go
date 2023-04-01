@@ -43,7 +43,7 @@ func TestFactoryRegisterAggregate(t *testing.T) {
 		eventApplier := aggregate.NewEventApplier()
 		eventApplier.RegisterAppliers(agg)
 
-		expected := aggregate.NewAdvanced(
+		expected := aggregate.New(
 			agg,
 			commandHandler,
 			eventApplier,
@@ -52,7 +52,7 @@ func TestFactoryRegisterAggregate(t *testing.T) {
 		f := aggregate.NewFactory()
 
 		// act
-		f.RegisterAggregate(func(ID cqrs.Identifier) cqrs.AdvancedAggregate {
+		f.RegisterAggregate(func(ID cqrs.Identifier) cqrs.ESAggregate {
 			return expected
 		})
 		newAgg, err := f.CreateAggregate(aggtest.TestAggregateType, ID)

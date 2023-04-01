@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/screwyprof/cqrs"
+	"github.com/screwyprof/cqrs/x"
 )
 
 // ErrConcurrencyViolation happens if aggregate has been modified concurrently.
@@ -15,11 +16,11 @@ type InMemoryEventStore struct {
 	eventStreams   map[cqrs.Identifier][]cqrs.DomainEvent
 	eventStreamsMu sync.RWMutex
 
-	eventPublisher cqrs.EventPublisher
+	eventPublisher x.EventPublisher
 }
 
 // NewInInMemoryEventStore creates a new instance of InMemoryEventStore.
-func NewInInMemoryEventStore(eventPublisher cqrs.EventPublisher) *InMemoryEventStore {
+func NewInInMemoryEventStore(eventPublisher x.EventPublisher) *InMemoryEventStore {
 	if eventPublisher == nil {
 		panic("eventPublisher is required")
 	}

@@ -3,15 +3,13 @@ package aggregate
 import (
 	"fmt"
 	"reflect"
-	"sync"
 
 	"github.com/screwyprof/cqrs"
 )
 
 // CommandHandler registers and handles commands.
 type CommandHandler struct {
-	handlers   map[string]cqrs.CommandHandlerFunc
-	handlersMu sync.RWMutex
+	handlers map[string]cqrs.CommandHandlerFunc
 }
 
 // NewCommandHandler creates a new instance of CommandHandler.
@@ -23,9 +21,6 @@ func NewCommandHandler() *CommandHandler {
 
 // Handle implements cqrs.CommandHandler interface.
 func (h *CommandHandler) Handle(c cqrs.Command) ([]cqrs.DomainEvent, error) {
-	h.handlersMu.RLock()
-	defer h.handlersMu.RUnlock()
-
 	handler, ok := h.handlers[c.CommandType()]
 	if !ok {
 		return nil, fmt.Errorf("handler for %s command is not found", c.CommandType())
@@ -36,8 +31,6 @@ func (h *CommandHandler) Handle(c cqrs.Command) ([]cqrs.DomainEvent, error) {
 
 // RegisterHandler registers a command handler for the given method.
 func (h *CommandHandler) RegisterHandler(method string, handler cqrs.CommandHandlerFunc) {
-	h.handlersMu.Lock()
-	defer h.handlersMu.Unlock()
 	h.handlers[method] = handler
 }
 
@@ -63,10 +56,23 @@ func (h *CommandHandler) methodHasValidSignature(method reflect.Method) bool {
 
 	// ensure that the method has a cqrs.Command as a parameter.
 	cmdIntfType := reflect.TypeOf((*cqrs.Command)(nil)).Elem()
-
 	cmdType := method.Type.In(1)
 
-	return cmdType.Implements(cmdIntfType)
+	if !cmdType.Implements(cmdIntfType) {
+		return false
+	}
+
+	// ensure the method has two output parameters
+	if method.Type.NumOut() != 2 {
+		return false
+	}
+
+	// ensure the second output parameter is of type error
+	if method.Type.Out(1) != reflect.TypeOf((*error)(nil)).Elem() {
+		return false
+	}
+
+	return true
 }
 
 func (h *CommandHandler) invokeCommandHandler(

@@ -9,10 +9,10 @@ import (
 )
 
 // GivenFn is a test init function.
-type GivenFn func() (cqrs.AdvancedAggregate, []cqrs.DomainEvent)
+type GivenFn func() (cqrs.ESAggregate, []cqrs.DomainEvent)
 
 // WhenFn is a command handler function.
-type WhenFn func(agg cqrs.AdvancedAggregate, err error) ([]cqrs.DomainEvent, error)
+type WhenFn func(agg cqrs.ESAggregate, err error) ([]cqrs.DomainEvent, error)
 
 // ThenFn prepares the Checker.
 type ThenFn func(t *testing.T) Checker
@@ -40,15 +40,15 @@ func Test(t *testing.T) AggregateTester {
 }
 
 // Given prepares the given aggregate for testing.
-func Given(agg cqrs.AdvancedAggregate, events ...cqrs.DomainEvent) GivenFn {
-	return func() (cqrs.AdvancedAggregate, []cqrs.DomainEvent) {
+func Given(agg cqrs.ESAggregate, events ...cqrs.DomainEvent) GivenFn {
+	return func() (cqrs.ESAggregate, []cqrs.DomainEvent) {
 		return agg, events
 	}
 }
 
 // When prepares the command handler for the given command.
 func When(c cqrs.Command) WhenFn {
-	return func(agg cqrs.AdvancedAggregate, err error) ([]cqrs.DomainEvent, error) {
+	return func(agg cqrs.ESAggregate, err error) ([]cqrs.DomainEvent, error) {
 		if err != nil {
 			return nil, err
 		}
@@ -77,7 +77,7 @@ func ThenFailWith(want error) ThenFn {
 	}
 }
 
-func applyEvents(given GivenFn) (cqrs.AdvancedAggregate, error) {
+func applyEvents(given GivenFn) (cqrs.ESAggregate, error) {
 	agg, events := given()
 	err := agg.Apply(events...)
 	if err != nil {

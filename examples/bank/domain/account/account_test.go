@@ -118,7 +118,7 @@ func TestAggregate(t *testing.T) {
 	})
 }
 
-func createTestAggregate(ID domain.Identifier) *aggregate.Advanced {
+func createTestAggregate(ID domain.Identifier) *aggregate.EventSourced {
 	accAgg := account.NewAggregate(ID)
 
 	commandHandler := aggregate.NewCommandHandler()
@@ -127,5 +127,5 @@ func createTestAggregate(ID domain.Identifier) *aggregate.Advanced {
 	eventApplier := aggregate.NewEventApplier()
 	eventApplier.RegisterAppliers(accAgg)
 
-	return aggregate.NewAdvanced(accAgg, commandHandler, eventApplier)
+	return aggregate.New(accAgg, commandHandler, eventApplier)
 }

@@ -7,12 +7,13 @@ import (
 
 	"github.com/screwyprof/cqrs"
 	event "github.com/screwyprof/cqrs/aggregate/aggtest"
+	"github.com/screwyprof/cqrs/x"
 	"github.com/screwyprof/cqrs/x/eventbus"
 	"github.com/screwyprof/cqrs/x/eventhandler/evnhndtest"
 )
 
 // ensure that EventBus implements cqrs.EventPublisher interface.
-var _ cqrs.EventPublisher = (*eventbus.InMemoryEventBus)(nil)
+var _ x.EventPublisher = (*eventbus.InMemoryEventBus)(nil)
 
 func TestNewInMemoryEventBus(t *testing.T) {
 	t.Run("ItCreatesNewInstance", func(t *testing.T) {

@@ -63,7 +63,7 @@ func createDispatcher(accountReporter eh.AccountReporting) *dispatcher.Dispatche
 	return dispatcher.NewDispatcher(aggregateStore)
 }
 
-func createAggregate(ID cqrs.Identifier) cqrs.AdvancedAggregate {
+func createAggregate(ID cqrs.Identifier) cqrs.ESAggregate {
 	acc := account.NewAggregate(ID)
 
 	commandHandler := aggregate.NewCommandHandler()
@@ -72,7 +72,7 @@ func createAggregate(ID cqrs.Identifier) cqrs.AdvancedAggregate {
 	eventApplier := aggregate.NewEventApplier()
 	eventApplier.RegisterAppliers(acc)
 
-	return aggregate.NewAdvanced(acc, commandHandler, eventApplier)
+	return aggregate.New(acc, commandHandler, eventApplier)
 }
 
 func failCommandOnError(_ []cqrs.DomainEvent, err error) {

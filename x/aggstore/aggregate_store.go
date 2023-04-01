@@ -2,16 +2,17 @@ package aggstore
 
 import (
 	"github.com/screwyprof/cqrs"
+	"github.com/screwyprof/cqrs/x"
 )
 
 // AggregateStore loads and stores aggregates.
 type AggregateStore struct {
 	aggregateFactory cqrs.AggregateFactory
-	eventStore       cqrs.EventStore
+	eventStore       x.EventStore
 }
 
 // NewStore creates a new instance of AggregateStore.
-func NewStore(eventStore cqrs.EventStore, aggregateFactory cqrs.AggregateFactory) *AggregateStore {
+func NewStore(eventStore x.EventStore, aggregateFactory cqrs.AggregateFactory) *AggregateStore {
 	if eventStore == nil {
 		panic("eventStore is required")
 	}
@@ -27,7 +28,7 @@ func NewStore(eventStore cqrs.EventStore, aggregateFactory cqrs.AggregateFactory
 }
 
 // Load implements cqrs.AggregateStore interface.
-func (s *AggregateStore) Load(aggregateID cqrs.Identifier, aggregateType string) (cqrs.AdvancedAggregate, error) {
+func (s *AggregateStore) Load(aggregateID cqrs.Identifier, aggregateType string) (cqrs.ESAggregate, error) {
 	loadedEvents, err := s.eventStore.LoadEventsFor(aggregateID)
 	if err != nil {
 		return nil, err
@@ -47,6 +48,6 @@ func (s *AggregateStore) Load(aggregateID cqrs.Identifier, aggregateType string)
 }
 
 // Store implements cqrs.AggregateStore interface.
-func (s *AggregateStore) Store(agg cqrs.AdvancedAggregate, events ...cqrs.DomainEvent) error {
+func (s *AggregateStore) Store(agg cqrs.ESAggregate, events ...cqrs.DomainEvent) error {
 	return s.eventStore.StoreEventsFor(agg.AggregateID(), agg.Version(), events)
 }

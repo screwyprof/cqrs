@@ -8,12 +8,13 @@ import (
 
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate/aggtest"
+	"github.com/screwyprof/cqrs/x"
 	"github.com/screwyprof/cqrs/x/eventbus/evnbustest"
 	"github.com/screwyprof/cqrs/x/eventstore"
 )
 
 // ensure that event aggstore implements cqrs.EventStore interface.
-var _ cqrs.EventStore = (*eventstore.InMemoryEventStore)(nil)
+var _ x.EventStore = (*eventstore.InMemoryEventStore)(nil)
 
 func TestNewInInMemoryEventStore(t *testing.T) {
 	t.Run("ItCreatesEventStore", func(t *testing.T) {

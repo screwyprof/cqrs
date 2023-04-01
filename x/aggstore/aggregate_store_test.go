@@ -9,12 +9,13 @@ import (
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate"
 	"github.com/screwyprof/cqrs/aggregate/aggtest"
+	"github.com/screwyprof/cqrs/x"
 	"github.com/screwyprof/cqrs/x/aggstore"
 	"github.com/screwyprof/cqrs/x/eventstore/evnstoretest"
 )
 
 // ensure that AggregateStore implements cqrs.AggregateStore interface.
-var _ cqrs.AggregateStore = (*aggstore.AggregateStore)(nil)
+var _ x.AggregateStore = (*aggstore.AggregateStore)(nil)
 
 func TestNewStore(t *testing.T) {
 	t.Run("ItPanicsIfEventStoreIsNotGiven", func(t *testing.T) {
@@ -105,7 +106,7 @@ func TestAggregateStoreStore(t *testing.T) {
 	})
 }
 
-func createAgg(id cqrs.Identifier) *aggregate.Advanced {
+func createAgg(id cqrs.Identifier) *aggregate.EventSourced {
 	pureAgg := aggtest.NewTestAggregate(id)
 
 	commandHandler := aggregate.NewCommandHandler()
@@ -114,7 +115,7 @@ func createAgg(id cqrs.Identifier) *aggregate.Advanced {
 	eventApplier := aggregate.NewEventApplier()
 	eventApplier.RegisterAppliers(pureAgg)
 
-	return aggregate.NewAdvanced(pureAgg, commandHandler, eventApplier)
+	return aggregate.New(pureAgg, commandHandler, eventApplier)
 }
 
 type aggregateStoreOptions struct {
@@ -174,7 +175,7 @@ func createAggregateStore(id cqrs.Identifier, opts ...option) *aggstore.Aggregat
 	commandHandler := aggregate.NewCommandHandler()
 	commandHandler.RegisterHandlers(pureAgg)
 
-	agg := aggregate.NewAdvanced(pureAgg, commandHandler, applier)
+	agg := aggregate.New(pureAgg, commandHandler, applier)
 	if config.loadedEvents != nil {
 		_ = agg.Apply(config.loadedEvents...)
 	}
@@ -184,12 +185,13 @@ func createAggregateStore(id cqrs.Identifier, opts ...option) *aggstore.Aggregat
 	return aggstore.NewStore(eventStore, aggFactory)
 }
 
-func createAggFactory(agg *aggregate.Advanced, empty bool) *aggregate.Factory {
+func createAggFactory(agg *aggregate.EventSourced, empty bool) *aggregate.Factory {
 	f := aggregate.NewFactory()
 	if empty {
 		return f
 	}
-	f.RegisterAggregate(func(ID cqrs.Identifier) cqrs.AdvancedAggregate {
+
+	f.RegisterAggregate(func(ID cqrs.Identifier) cqrs.ESAggregate {
 		return agg
 	})
 
