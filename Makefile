@@ -6,6 +6,8 @@ GO_FILES = $(shell find . -name "*.go" | uniq)
 GO_PACKAGES = $(shell go list ./... | tr '\n', ',')
 LOCAL_PACKAGES="github.com/screwyprof/"
 
+IGNORE_COVERAGE_FOR= -e .*test
+
 OK_COLOR=\033[32;01m
 NO_COLOR=\033[0m
 MAKE_COLOR=\033[33;01m%-20s\033[0m
@@ -26,7 +28,8 @@ lint: ## run linters
 
 test: ## run  tests
 	@echo "$(OK_COLOR)--> Running unit tests$(NO_COLOR)"
-	go test -v --race --count=1 -coverprofile=coverage.out ./...
+	go test -v --race --count=1 -coverprofile=coverage.tmp ./...
+	@set -euo pipefail && cat coverage.tmp | grep -v $(IGNORE_COVERAGE_FOR) > coverage.out && rm coverage.tmp
 
 coverage: test ## show test coverage report
 	@echo "$(OK_COLOR)--> Showing test coverage$(NO_COLOR)"
