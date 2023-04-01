@@ -2,7 +2,7 @@ name: reviewdog
 on:
   push:
     branches:
-      - main
+      - master
       - 'pr/*'
   pull_request:
 jobs:
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: fetch master to compare against the latest revision
-        run: git fetch origin master && git branch master remotes/origin/master
+        run: git fetch origin master
       - name: golangci-lint
         uses: reviewdog/action-golangci-lint@v2
         with:
