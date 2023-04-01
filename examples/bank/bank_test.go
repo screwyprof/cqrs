@@ -6,24 +6,23 @@ import (
 
 	"github.com/go-faker/faker/v4"
 
-	"github.com/screwyprof/cqrs/examples/bank/internal/reporting"
-	"github.com/screwyprof/cqrs/examples/bank/internal/ui"
-	"github.com/screwyprof/cqrs/examples/bank/pkg/command"
-	"github.com/screwyprof/cqrs/examples/bank/pkg/domain/account"
-	eh "github.com/screwyprof/cqrs/examples/bank/pkg/eventhandler"
-	"github.com/screwyprof/cqrs/examples/bank/pkg/report"
-	"github.com/screwyprof/cqrs/pkg/cqrs"
-	"github.com/screwyprof/cqrs/pkg/cqrs/aggregate"
-	"github.com/screwyprof/cqrs/pkg/cqrs/dispatcher"
-	"github.com/screwyprof/cqrs/pkg/cqrs/eventbus"
-	"github.com/screwyprof/cqrs/pkg/cqrs/eventhandler"
-	"github.com/screwyprof/cqrs/pkg/cqrs/eventstore"
-	"github.com/screwyprof/cqrs/pkg/cqrs/store"
-	"github.com/screwyprof/cqrs/pkg/cqrs/testdata/mock"
+	"github.com/screwyprof/cqrs"
+	"github.com/screwyprof/cqrs/aggregate"
+	"github.com/screwyprof/cqrs/aggregate/aggtest"
+	"github.com/screwyprof/cqrs/examples/bank/domain/account"
+	"github.com/screwyprof/cqrs/examples/bank/domain/command"
+	eh "github.com/screwyprof/cqrs/examples/bank/eventhandler"
+	"github.com/screwyprof/cqrs/examples/bank/reporting"
+	"github.com/screwyprof/cqrs/examples/bank/ui"
+	"github.com/screwyprof/cqrs/x/aggstore"
+	"github.com/screwyprof/cqrs/x/dispatcher"
+	"github.com/screwyprof/cqrs/x/eventbus"
+	"github.com/screwyprof/cqrs/x/eventhandler"
+	"github.com/screwyprof/cqrs/x/eventstore"
 )
 
 func Example() {
-	ID := mock.StringIdentifier(faker.UUIDHyphenated())
+	ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 	AccNumber := "ACC777"
 
 	accountReporter := reporting.NewInMemoryAccountReporter()
@@ -46,7 +45,7 @@ func Example() {
 	// 3 |   500.00 |  1400.00
 }
 
-func createDispatcher(accountReporter report.AccountReporting) *dispatcher.Dispatcher {
+func createDispatcher(accountReporter eh.AccountReporting) *dispatcher.Dispatcher {
 	aggregateFactory := aggregate.NewFactory()
 	aggregateFactory.RegisterAggregate(createAggregate)
 
@@ -56,7 +55,7 @@ func createDispatcher(accountReporter report.AccountReporting) *dispatcher.Dispa
 	eventPublisher := eventbus.NewInMemoryEventBus()
 	eventPublisher.Register(accountDetailsProjector)
 
-	aggregateStore := store.NewStore(
+	aggregateStore := aggstore.NewStore(
 		eventstore.NewInInMemoryEventStore(eventPublisher),
 		aggregateFactory,
 	)
