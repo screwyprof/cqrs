@@ -47,7 +47,7 @@ func Example() {
 
 func createDispatcher(accountReporter eh.AccountReporting) *dispatcher.Dispatcher {
 	aggregateFactory := aggregate.NewFactory()
-	aggregateFactory.RegisterAggregate(createAggregate)
+	aggregateFactory.RegisterAggregate("account.Aggregate", createAggregate)
 
 	accountDetailsProjector := eventhandler.New()
 	accountDetailsProjector.RegisterHandlers(eh.NewAccountDetailsProjector(accountReporter))

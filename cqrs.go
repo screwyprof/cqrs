@@ -72,6 +72,6 @@ type FactoryFn func(Identifier) ESAggregate
 // AggregateFactory is responsible for creating aggregates.
 // It registers aggregate factory functions and creates aggregates based on a given aggregate type and identifier.
 type AggregateFactory interface {
-	RegisterAggregate(factory FactoryFn)
+	RegisterAggregate(aggregateType string, factory FactoryFn)
 	CreateAggregate(aggregateType string, ID Identifier) (ESAggregate, error)
 }

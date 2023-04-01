@@ -52,7 +52,7 @@ func TestFactoryRegisterAggregate(t *testing.T) {
 		f := aggregate.NewFactory()
 
 		// act
-		f.RegisterAggregate(func(ID cqrs.Identifier) cqrs.ESAggregate {
+		f.RegisterAggregate(agg.AggregateType(), func(ID cqrs.Identifier) cqrs.ESAggregate {
 			return expected
 		})
 		newAgg, err := f.CreateAggregate(aggtest.TestAggregateType, ID)

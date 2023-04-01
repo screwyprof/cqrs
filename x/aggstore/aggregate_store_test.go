@@ -191,7 +191,7 @@ func createAggFactory(agg *aggregate.EventSourced, empty bool) *aggregate.Factor
 		return f
 	}
 
-	f.RegisterAggregate(func(ID cqrs.Identifier) cqrs.ESAggregate {
+	f.RegisterAggregate(agg.AggregateType(), func(ID cqrs.Identifier) cqrs.ESAggregate {
 		return agg
 	})
 
