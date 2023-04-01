@@ -22,7 +22,7 @@ func (i StringIdentifier) String() string {
 
 // TestAggregate a pure aggregate (has no external dependencies or dark magic method) used for testing.
 type TestAggregate struct {
-	id      cqrs.Identifier
+	id      Identifier
 	version int
 	aggType string
 
@@ -35,7 +35,7 @@ func NewTestAggregate(ID cqrs.Identifier) *TestAggregate {
 }
 
 // AggregateID implements cqrs.Aggregate interface.
-func (a *TestAggregate) AggregateID() cqrs.Identifier {
+func (a *TestAggregate) AggregateID() Identifier {
 	return a.id
 }
 
@@ -44,16 +44,17 @@ func (a *TestAggregate) AggregateType() string {
 	return "mock.TestAggregate"
 }
 
-func (a *TestAggregate) MakeSomethingHappen(c MakeSomethingHappen) ([]cqrs.DomainEvent, error) {
+func (a *TestAggregate) MakeSomethingHappen(_ MakeSomethingHappen) ([]Event, error) {
 	if a.alreadyHappened {
 		return nil, ErrItCanHappenOnceOnly
 	}
-	return []cqrs.DomainEvent{SomethingHappened{}}, nil
+
+	return []Event{SomethingHappened{}}, nil
 }
 
-func (a *TestAggregate) OnSomethingHappened(e SomethingHappened) {
+func (a *TestAggregate) OnSomethingHappened(_ SomethingHappened) {
 	a.alreadyHappened = true
 }
 
-func (a *TestAggregate) OnSomethingElseHappened(e SomethingElseHappened) {
+func (a *TestAggregate) OnSomethingElseHappened(_ SomethingElseHappened) {
 }

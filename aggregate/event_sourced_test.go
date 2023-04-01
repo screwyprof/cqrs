@@ -153,8 +153,6 @@ func createEventApplier(pureAgg *TestAggregate) *aggregate.EventApplier {
 
 func createCommandHandler(pureAgg *TestAggregate) *aggregate.CommandHandler {
 	commandHandler := aggregate.NewCommandHandler()
-	commandHandler.RegisterHandler("MakeSomethingHappen", func(c cqrs.Command) ([]cqrs.DomainEvent, error) {
-		return pureAgg.MakeSomethingHappen(c.(MakeSomethingHappen))
-	})
+	commandHandler.RegisterHandlers(pureAgg)
 	return commandHandler
 }
