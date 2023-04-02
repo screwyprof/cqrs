@@ -58,7 +58,7 @@ func TestAggregateStoreLoad(t *testing.T) {
 		_, err := s.Load(ID, aggtest.TestAggregateType)
 
 		// assert
-		assert.Equal(t, aggtest.ErrAggIsNotRegistered, err)
+		assert.ErrorIs(t, err, aggregate.ErrAggregateNotRegistered)
 	})
 
 	t.Run("ItFailsIfItCannotApplyEvents", func(t *testing.T) {
@@ -74,7 +74,7 @@ func TestAggregateStoreLoad(t *testing.T) {
 		_, err := s.Load(ID, aggtest.TestAggregateType)
 
 		// assert
-		assert.Equal(t, aggtest.ErrOnSomethingHappenedApplierNotFound, err)
+		assert.ErrorIs(t, err, aggregate.ErrEventApplierNotFound)
 	})
 
 	t.Run("ItReturnsAggregate", func(t *testing.T) {
@@ -107,15 +107,15 @@ func TestAggregateStoreStore(t *testing.T) {
 }
 
 func createAgg(id cqrs.Identifier) *aggregate.EventSourced {
-	pureAgg := aggtest.NewTestAggregate(id)
+	agg := aggtest.NewTestAggregate(id)
 
 	commandHandler := aggregate.NewCommandHandler()
-	commandHandler.RegisterHandlers(pureAgg)
+	commandHandler.RegisterHandlers(agg)
 
 	eventApplier := aggregate.NewEventApplier()
-	eventApplier.RegisterAppliers(pureAgg)
+	eventApplier.RegisterAppliers(agg)
 
-	return aggregate.New(pureAgg, commandHandler, eventApplier)
+	return aggregate.New(agg, commandHandler, eventApplier)
 }
 
 type aggregateStoreOptions struct {
@@ -165,21 +165,22 @@ func createAggregateStore(id cqrs.Identifier, opts ...option) *aggstore.Aggregat
 		opt(config)
 	}
 
-	pureAgg := aggtest.NewTestAggregate(id)
+	agg := aggtest.NewTestAggregate(id)
 
 	applier := aggregate.NewEventApplier()
 	if !config.staticEventApplier {
-		applier.RegisterAppliers(pureAgg)
+		applier.RegisterAppliers(agg)
 	}
 
 	commandHandler := aggregate.NewCommandHandler()
-	commandHandler.RegisterHandlers(pureAgg)
+	commandHandler.RegisterHandlers(agg)
 
-	agg := aggregate.New(pureAgg, commandHandler, applier)
+	esAgg := aggregate.New(agg, commandHandler, applier)
 	if config.loadedEvents != nil {
-		_ = agg.Apply(config.loadedEvents...)
+		_ = esAgg.Apply(config.loadedEvents...)
 	}
-	aggFactory := createAggFactory(agg, config.emptyFactory)
+
+	aggFactory := createAggFactory(esAgg, config.emptyFactory)
 	eventStore := createEventStoreMock(config.loadedEvents, config.loadErr, config.storeErr)
 
 	return aggstore.NewStore(eventStore, aggFactory)

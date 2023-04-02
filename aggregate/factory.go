@@ -1,7 +1,7 @@
 package aggregate
 
 import (
-	"errors"
+	"fmt"
 
 	"github.com/screwyprof/cqrs"
 )
@@ -34,8 +34,21 @@ func (f *Factory) RegisterAggregate(aggregateType string, factory cqrs.FactoryFn
 func (f *Factory) CreateAggregate(aggregateType string, id cqrs.Identifier) (cqrs.ESAggregate, error) {
 	factory, ok := f.factories[aggregateType]
 	if !ok {
-		return nil, errors.New(aggregateType + " is not registered")
+		return nil, fmt.Errorf("%w: %s", ErrAggregateNotRegistered, aggregateType)
 	}
 
 	return factory(id), nil
+}
+
+// FromAggregate takes a cqrs.Aggregate and returns a cqrs.ESAggregate.
+//
+// It automatically registers all the command handlers and event appliers found in the aggregate.
+func FromAggregate(agg cqrs.Aggregate) *EventSourced {
+	handler := NewCommandHandler()
+	handler.RegisterHandlers(agg)
+
+	eventApplier := NewEventApplier()
+	eventApplier.RegisterAppliers(agg)
+
+	return New(agg, handler, eventApplier)
 }

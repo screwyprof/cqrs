@@ -7,11 +7,9 @@ import (
 )
 
 var (
-	ErrItCanHappenOnceOnly                = errors.New("some business rule error occurred")
-	ErrMakeSomethingHandlerNotFound       = errors.New("handler for MakeSomethingHappen command is not found")
-	ErrOnSomethingHappenedApplierNotFound = errors.New("event applier for OnSomethingHappened event is not found")
+	ErrItCanHappenOnceOnly = errors.New("some business rule error occurred")
 
-	TestAggregateType = "mock.TestAggregate"
+	TestAggregateType = "mock.TestAggregate" //nolint:gochecknoglobals
 )
 
 type StringIdentifier string
@@ -20,18 +18,16 @@ func (i StringIdentifier) String() string {
 	return string(i)
 }
 
-// TestAggregate a pure aggregate (has no external dependencies or dark magic method) used for testing.
+// TestAggregate is a user-defined aggregate (has no external dependencies or dark magic methods) used for testing.
 type TestAggregate struct {
-	id      Identifier
-	version int
-	aggType string
+	id Identifier
 
 	alreadyHappened bool
 }
 
 // NewTestAggregate creates a new instance of TestAggregate.
-func NewTestAggregate(ID cqrs.Identifier) *TestAggregate {
-	return &TestAggregate{id: ID}
+func NewTestAggregate(id cqrs.Identifier) *TestAggregate {
+	return &TestAggregate{id: id}
 }
 
 // AggregateID implements cqrs.Aggregate interface.
@@ -41,7 +37,7 @@ func (a *TestAggregate) AggregateID() Identifier {
 
 // AggregateType implements cqrs.Aggregate interface.
 func (a *TestAggregate) AggregateType() string {
-	return "mock.TestAggregate"
+	return TestAggregateType
 }
 
 func (a *TestAggregate) MakeSomethingHappen(_ MakeSomethingHappen) ([]Event, error) {

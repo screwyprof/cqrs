@@ -19,9 +19,9 @@ type EventSourced struct {
 //
 // It requires a basic cqrs.Aggregate, a cqrs.CommandHandler, and a cqrs.EventApplier as parameters.
 // It returns a pointer to an EventSourced instance.
-func New(agg cqrs.Aggregate, commandHandler cqrs.CommandHandler, eventApplier cqrs.EventApplier) *EventSourced {
-	if agg == nil {
-		panic("pureAgg is required")
+func New(aggregate cqrs.Aggregate, commandHandler cqrs.CommandHandler, eventApplier cqrs.EventApplier) *EventSourced {
+	if aggregate == nil {
+		panic("aggregate is required")
 	}
 
 	if commandHandler == nil {
@@ -33,7 +33,7 @@ func New(agg cqrs.Aggregate, commandHandler cqrs.CommandHandler, eventApplier cq
 	}
 
 	return &EventSourced{
-		Aggregate:      agg,
+		Aggregate:      aggregate,
 		commandHandler: commandHandler,
 		eventApplier:   eventApplier,
 	}

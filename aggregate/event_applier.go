@@ -47,14 +47,16 @@ func (a *EventApplier) Apply(events ...cqrs.DomainEvent) error {
 			return err
 		}
 	}
+
 	return nil
 }
 
 func (a *EventApplier) apply(event cqrs.DomainEvent) error {
 	applierID := "On" + event.EventType()
+
 	applier, ok := a.appliers[applierID]
 	if !ok {
-		return fmt.Errorf("event applier for %s event is not found", applierID)
+		return fmt.Errorf("%w: %s", ErrEventApplierNotFound, applierID)
 	}
 
 	applier(event)

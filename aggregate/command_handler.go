@@ -23,7 +23,7 @@ func NewCommandHandler() *CommandHandler {
 func (h *CommandHandler) Handle(c cqrs.Command) ([]cqrs.DomainEvent, error) {
 	handler, ok := h.handlers[c.CommandType()]
 	if !ok {
-		return nil, fmt.Errorf("handler for %s command is not found", c.CommandType())
+		return nil, fmt.Errorf("%w: %s", ErrCommandHandlerNotFound, c.CommandType())
 	}
 
 	return handler(c)
@@ -39,7 +39,8 @@ func (h *CommandHandler) RegisterHandlers(aggregate cqrs.Aggregate) {
 	aggregateType := reflect.TypeOf(aggregate)
 	for i := 0; i < aggregateType.NumMethod(); i++ {
 		method := aggregateType.Method(i)
-		if !h.methodHasValidSignature(method) {
+
+		if !h.isCommandHandler(method) {
 			continue
 		}
 
@@ -49,30 +50,49 @@ func (h *CommandHandler) RegisterHandlers(aggregate cqrs.Aggregate) {
 	}
 }
 
-func (h *CommandHandler) methodHasValidSignature(method reflect.Method) bool {
+func (h *CommandHandler) isCommandHandler(method reflect.Method) bool {
+	return h.commandHandlerHasExpectedInputs(method) && h.commandHandlerHasExpectedOutputs(method)
+}
+
+func (h *CommandHandler) commandHandlerHasExpectedInputs(method reflect.Method) bool {
 	if method.Type.NumIn() != 2 {
 		return false
 	}
 
-	// ensure that the method has a cqrs.Command as a parameter.
 	cmdIntfType := reflect.TypeOf((*cqrs.Command)(nil)).Elem()
 	cmdType := method.Type.In(1)
 
-	if !cmdType.Implements(cmdIntfType) {
-		return false
-	}
+	return cmdType.Implements(cmdIntfType)
+}
 
-	// ensure the method has two output parameters
-	if method.Type.NumOut() != 2 {
-		return false
-	}
+func (h *CommandHandler) commandHandlerHasExpectedOutputs(method reflect.Method) bool {
+	return method.Type.NumOut() == 2 &&
+		h.commandHandlerReturnsDomainEvents(method) &&
+		h.commandHandlerReturnsAnError(method)
+}
 
-	// ensure the second output parameter is of type error
-	if method.Type.Out(1) != reflect.TypeOf((*error)(nil)).Elem() {
-		return false
-	}
+func (h *CommandHandler) commandHandlerReturnsDomainEvents(method reflect.Method) bool {
+	eventSliceType := method.Type.Out(0)
 
-	return true
+	return eventSliceType.Kind() == reflect.Slice && h.isDomainEvent(eventSliceType.Elem())
+}
+
+func (h *CommandHandler) isDomainEvent(eventType reflect.Type) bool {
+	method, ok := eventType.MethodByName("EventType")
+
+	return ok && h.eventTypeMethodHasNoInputs(method) && h.eventTypeMethodReturnsString(method)
+}
+
+func (h *CommandHandler) commandHandlerReturnsAnError(method reflect.Method) bool {
+	return method.Type.Out(1) == reflect.TypeOf((*error)(nil)).Elem()
+}
+
+func (h *CommandHandler) eventTypeMethodHasNoInputs(method reflect.Method) bool {
+	return method.Type.NumIn() == 0
+}
+
+func (h *CommandHandler) eventTypeMethodReturnsString(method reflect.Method) bool {
+	return method.Type.NumOut() == 1 && method.Type.Out(0) == reflect.TypeOf("")
 }
 
 func (h *CommandHandler) invokeCommandHandler(
@@ -82,11 +102,12 @@ func (h *CommandHandler) invokeCommandHandler(
 
 	resErr := result[1].Interface()
 	if resErr != nil {
-		return nil, resErr.(error)
+		return nil, resErr.(error) //nolint:forcetypeassert
 	}
-	eventsIntf := result[0].Interface()
 
+	eventsIntf := result[0].Interface()
 	events := h.convertDomainEvents(eventsIntf)
+
 	return events, nil
 }
 
@@ -95,7 +116,7 @@ func (h *CommandHandler) convertDomainEvents(eventsIntf interface{}) []cqrs.Doma
 
 	events := make([]cqrs.DomainEvent, 0, len(eventsIntfs))
 	for _, eventIntf := range eventsIntfs {
-		events = append(events, eventIntf.(cqrs.DomainEvent))
+		events = append(events, eventIntf.(cqrs.DomainEvent)) //nolint:forcetypeassert
 	}
 
 	return events

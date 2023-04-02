@@ -16,38 +16,41 @@ import (
 	"github.com/screwyprof/cqrs/examples/bank/domain/event"
 )
 
-// ensure that game aggregate implements cqrs.Aggregate interface.
+// ensure that the account aggregate implements cqrs.Aggregate interface.
 var _ cqrs.Aggregate = (*account.Aggregate)(nil)
 
-func TestNewAggregate(t *testing.T) {
-	t.Run("ItPanicsIfIDIsNotGiven", func(t *testing.T) {
+func TestAggregate(t *testing.T) {
+	t.Run("panics if ID is not given", func(t *testing.T) {
+		t.Parallel()
+
 		factory := func() {
 			account.NewAggregate(nil)
 		}
+
 		assert.Panics(t, factory)
 	})
-}
 
-func TestAggregateAggregateID(t *testing.T) {
-	t.Run("ItReturnsAggregateID", func(t *testing.T) {
+	t.Run("returns aggregate ID", func(t *testing.T) {
+		t.Parallel()
+
 		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		agg := account.NewAggregate(ID)
 
 		assert.Equal(t, ID, agg.AggregateID())
 	})
-}
 
-func TestAggregateAggregateType(t *testing.T) {
-	t.Run("ItReturnsAggregateType", func(t *testing.T) {
+	t.Run("returns aggregate type", func(t *testing.T) {
+		t.Parallel()
+
 		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		agg := account.NewAggregate(ID)
 
 		assert.Equal(t, "account.Aggregate", agg.AggregateType())
 	})
-}
 
-func TestAggregate(t *testing.T) {
-	t.Run("ItOpensAnAccount", func(t *testing.T) {
+	t.Run("opens an account", func(t *testing.T) {
+		t.Parallel()
+
 		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		number := faker.Word()
 
@@ -58,7 +61,9 @@ func TestAggregate(t *testing.T) {
 		)
 	})
 
-	t.Run("ItDepositsAnEmptyAccount", func(t *testing.T) {
+	t.Run("deposits to an empty account", func(t *testing.T) {
+		t.Parallel()
+
 		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		number := faker.Word()
 		amount := faker.UnixTime()
@@ -70,7 +75,9 @@ func TestAggregate(t *testing.T) {
 		)
 	})
 
-	t.Run("ItDepositsAnAccountWithInitialFunds", func(t *testing.T) {
+	t.Run("deposits to an account with initial funds", func(t *testing.T) {
+		t.Parallel()
+
 		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		number := faker.Word()
 
@@ -88,7 +95,9 @@ func TestAggregate(t *testing.T) {
 		)
 	})
 
-	t.Run("ItWithdrawsSomeFunds", func(t *testing.T) {
+	t.Run("withdraws some funds", func(t *testing.T) {
+		t.Parallel()
+
 		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		number := faker.Word()
 
@@ -105,7 +114,9 @@ func TestAggregate(t *testing.T) {
 		)
 	})
 
-	t.Run("ItCannotWithdrawMoneyIfBalanceIsNotHighEnough", func(t *testing.T) {
+	t.Run("cannot withdraw money if balance is not high enough", func(t *testing.T) {
+		t.Parallel()
+
 		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		number := faker.Word()
 		amount := faker.UnixTime()
@@ -121,11 +132,5 @@ func TestAggregate(t *testing.T) {
 func createTestAggregate(ID domain.Identifier) *aggregate.EventSourced {
 	accAgg := account.NewAggregate(ID)
 
-	commandHandler := aggregate.NewCommandHandler()
-	commandHandler.RegisterHandlers(accAgg)
-
-	eventApplier := aggregate.NewEventApplier()
-	eventApplier.RegisterAppliers(accAgg)
-
-	return aggregate.New(accAgg, commandHandler, eventApplier)
+	return aggregate.FromAggregate(accAgg)
 }

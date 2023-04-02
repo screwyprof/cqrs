@@ -106,21 +106,21 @@ func createDispatcher(id cqrs.Identifier, opts ...option) *dispatcher.Dispatcher
 		opt(config)
 	}
 
-	pureAgg := aggtest.NewTestAggregate(id)
+	agg := aggtest.NewTestAggregate(id)
 
 	commandHandler := aggregate.NewCommandHandler()
-	commandHandler.RegisterHandlers(pureAgg)
+	commandHandler.RegisterHandlers(agg)
 
 	eventApplier := aggregate.NewEventApplier()
-	eventApplier.RegisterAppliers(pureAgg)
+	eventApplier.RegisterAppliers(agg)
 
-	agg := aggregate.New(pureAgg, commandHandler, eventApplier)
+	esAgg := aggregate.New(agg, commandHandler, eventApplier)
 	if config.loadedEvents != nil {
-		_ = agg.Apply(config.loadedEvents...)
+		_ = esAgg.Apply(config.loadedEvents...)
 	}
 
 	return dispatcher.NewDispatcher(
-		createAggregateStoreMock(agg, config.loadErr, config.storeErr),
+		createAggregateStoreMock(esAgg, config.loadErr, config.storeErr),
 	)
 }
 
