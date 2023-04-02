@@ -4,15 +4,13 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-	"sync"
 
 	"github.com/screwyprof/cqrs"
 )
 
 // EventApplier applies events for the registered appliers.
 type EventApplier struct {
-	appliers   map[string]cqrs.EventApplierFunc
-	appliersMu sync.RWMutex
+	appliers map[string]cqrs.EventApplierFunc
 }
 
 // NewEventApplier creates a new instance of EventApplier.
@@ -39,8 +37,6 @@ func (a *EventApplier) RegisterAppliers(aggregate cqrs.Aggregate) {
 
 // RegisterApplier registers an event applier for the given method.
 func (a *EventApplier) RegisterApplier(method string, applier cqrs.EventApplierFunc) {
-	a.appliersMu.Lock()
-	defer a.appliersMu.Unlock()
 	a.appliers[method] = applier
 }
 
@@ -51,17 +47,16 @@ func (a *EventApplier) Apply(events ...cqrs.DomainEvent) error {
 			return err
 		}
 	}
+
 	return nil
 }
 
 func (a *EventApplier) apply(event cqrs.DomainEvent) error {
-	a.appliersMu.RLock()
-	defer a.appliersMu.RUnlock()
-
 	applierID := "On" + event.EventType()
+
 	applier, ok := a.appliers[applierID]
 	if !ok {
-		return fmt.Errorf("event applier for %s event is not found", applierID)
+		return fmt.Errorf("%w: %s", ErrEventApplierNotFound, applierID)
 	}
 
 	applier(event)

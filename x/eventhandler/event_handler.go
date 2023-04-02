@@ -7,23 +7,24 @@ import (
 	"sync"
 
 	"github.com/screwyprof/cqrs"
+	"github.com/screwyprof/cqrs/x"
 )
 
 // EventHandler handles events.
 type EventHandler struct {
-	handlers   map[string]cqrs.EventHandlerFunc
+	handlers   map[string]x.EventHandlerFunc
 	handlersMu sync.RWMutex
 }
 
 // New creates new instance of New.
 func New() *EventHandler {
 	return &EventHandler{
-		handlers: make(map[string]cqrs.EventHandlerFunc),
+		handlers: make(map[string]x.EventHandlerFunc),
 	}
 }
 
 // RegisterHandler registers an event handler for the given method.
-func (h *EventHandler) RegisterHandler(method string, handler cqrs.EventHandlerFunc) {
+func (h *EventHandler) RegisterHandler(method string, handler x.EventHandlerFunc) {
 	h.handlersMu.Lock()
 	defer h.handlersMu.Unlock()
 	h.handlers[method] = handler

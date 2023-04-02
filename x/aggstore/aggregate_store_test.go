@@ -9,12 +9,13 @@ import (
 	"github.com/screwyprof/cqrs"
 	"github.com/screwyprof/cqrs/aggregate"
 	"github.com/screwyprof/cqrs/aggregate/aggtest"
+	"github.com/screwyprof/cqrs/x"
 	"github.com/screwyprof/cqrs/x/aggstore"
 	"github.com/screwyprof/cqrs/x/eventstore/evnstoretest"
 )
 
 // ensure that AggregateStore implements cqrs.AggregateStore interface.
-var _ cqrs.AggregateStore = (*aggstore.AggregateStore)(nil)
+var _ x.AggregateStore = (*aggstore.AggregateStore)(nil)
 
 func TestNewStore(t *testing.T) {
 	t.Run("ItPanicsIfEventStoreIsNotGiven", func(t *testing.T) {
@@ -57,7 +58,7 @@ func TestAggregateStoreLoad(t *testing.T) {
 		_, err := s.Load(ID, aggtest.TestAggregateType)
 
 		// assert
-		assert.Equal(t, aggtest.ErrAggIsNotRegistered, err)
+		assert.ErrorIs(t, err, aggregate.ErrAggregateNotRegistered)
 	})
 
 	t.Run("ItFailsIfItCannotApplyEvents", func(t *testing.T) {
@@ -73,7 +74,7 @@ func TestAggregateStoreLoad(t *testing.T) {
 		_, err := s.Load(ID, aggtest.TestAggregateType)
 
 		// assert
-		assert.Equal(t, aggtest.ErrOnSomethingHappenedApplierNotFound, err)
+		assert.ErrorIs(t, err, aggregate.ErrEventApplierNotFound)
 	})
 
 	t.Run("ItReturnsAggregate", func(t *testing.T) {
@@ -105,16 +106,16 @@ func TestAggregateStoreStore(t *testing.T) {
 	})
 }
 
-func createAgg(id cqrs.Identifier) *aggregate.Advanced {
-	pureAgg := aggtest.NewTestAggregate(id)
+func createAgg(id cqrs.Identifier) *aggregate.EventSourced {
+	agg := aggtest.NewTestAggregate(id)
 
 	commandHandler := aggregate.NewCommandHandler()
-	commandHandler.RegisterHandlers(pureAgg)
+	commandHandler.RegisterHandlers(agg)
 
 	eventApplier := aggregate.NewEventApplier()
-	eventApplier.RegisterAppliers(pureAgg)
+	eventApplier.RegisterAppliers(agg)
 
-	return aggregate.NewAdvanced(pureAgg, commandHandler, eventApplier)
+	return aggregate.New(agg, commandHandler, eventApplier)
 }
 
 type aggregateStoreOptions struct {
@@ -164,32 +165,34 @@ func createAggregateStore(id cqrs.Identifier, opts ...option) *aggstore.Aggregat
 		opt(config)
 	}
 
-	pureAgg := aggtest.NewTestAggregate(id)
+	agg := aggtest.NewTestAggregate(id)
 
 	applier := aggregate.NewEventApplier()
 	if !config.staticEventApplier {
-		applier.RegisterAppliers(pureAgg)
+		applier.RegisterAppliers(agg)
 	}
 
 	commandHandler := aggregate.NewCommandHandler()
-	commandHandler.RegisterHandlers(pureAgg)
+	commandHandler.RegisterHandlers(agg)
 
-	agg := aggregate.NewAdvanced(pureAgg, commandHandler, applier)
+	esAgg := aggregate.New(agg, commandHandler, applier)
 	if config.loadedEvents != nil {
-		_ = agg.Apply(config.loadedEvents...)
+		_ = esAgg.Apply(config.loadedEvents...)
 	}
-	aggFactory := createAggFactory(agg, config.emptyFactory)
+
+	aggFactory := createAggFactory(esAgg, config.emptyFactory)
 	eventStore := createEventStoreMock(config.loadedEvents, config.loadErr, config.storeErr)
 
 	return aggstore.NewStore(eventStore, aggFactory)
 }
 
-func createAggFactory(agg *aggregate.Advanced, empty bool) *aggregate.Factory {
+func createAggFactory(agg *aggregate.EventSourced, empty bool) *aggregate.Factory {
 	f := aggregate.NewFactory()
 	if empty {
 		return f
 	}
-	f.RegisterAggregate(func(ID cqrs.Identifier) cqrs.AdvancedAggregate {
+
+	f.RegisterAggregate(agg.AggregateType(), func(ID cqrs.Identifier) cqrs.ESAggregate {
 		return agg
 	})
 

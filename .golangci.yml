@@ -31,10 +31,9 @@ linters:
     - durationcheck
     - errcheck
     - errchkjson
-    #- errname
+    - errname
     - errorlint
     - execinquery
-    #- errorsas
     - exhaustive
     - exportloopref
     #- forbidigo
@@ -68,7 +67,7 @@ linters:
     #- ireturn
     - ineffassign
     - lll
-    #- logrlint
+    - logrlint
     - maintidx
     - makezero
     - misspell
@@ -80,7 +79,7 @@ linters:
     - nolintlint
     - nonamedreturns
     - nosprintfhostport
-    #- paralleltest
+    - paralleltest
     - prealloc
     - predeclared
     - promlinter
@@ -94,7 +93,7 @@ linters:
     - tenv
     - testpackage
     - thelper
-    #- tparallel
+    - tparallel
     - typecheck
     - unconvert
     - unparam

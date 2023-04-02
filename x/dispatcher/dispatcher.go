@@ -2,6 +2,7 @@ package dispatcher
 
 import (
 	"github.com/screwyprof/cqrs"
+	"github.com/screwyprof/cqrs/x"
 )
 
 // Dispatcher is a basic message dispatcher.
@@ -11,11 +12,11 @@ import (
 // at startup and keep it in memory.
 // Depends on some kind of event storage mechanism.
 type Dispatcher struct {
-	store cqrs.AggregateStore
+	store x.AggregateStore
 }
 
 // NewDispatcher creates a new instance of Dispatcher.
-func NewDispatcher(aggregateStore cqrs.AggregateStore) *Dispatcher {
+func NewDispatcher(aggregateStore x.AggregateStore) *Dispatcher {
 	if aggregateStore == nil {
 		panic("aggregateStore is required")
 	}

@@ -24,13 +24,17 @@ tools: ## install dev tools, linters, code generators, etc..
 	@echo -e "$(OK_COLOR)--> Installing tools from tools/tools.go$(NO_COLOR)"
 	@export GOBIN=$$PWD/tools/bin; export PATH=$$GOBIN:$$PATH; cat tools/tools.go | grep _ | awk -F'"' '{print $$2}' | xargs -tI % go install %
 
-lint: ## run linters
+lint: ## run linters for the current changes
 	@echo -e "$(OK_COLOR)--> Running linters$(NO_COLOR)"
 	@tools/bin/golangci-lint run
 
+lint-all: ## run linters
+	@echo -e "$(OK_COLOR)==> Linting$(NO_COLOR)"
+	golangci-lint run ./... --new-from-rev=""
+
 test: ## run  tests
 	@echo -e "$(OK_COLOR)--> Running unit tests$(NO_COLOR)"
-	go test -v --race --count=1 -coverprofile=coverage.tmp ./...
+	go test -v --race --count=1 -covermode atomic -coverprofile=coverage.tmp ./...
 	@set -euo pipefail && cat coverage.tmp | grep -v $(IGNORE_COVERAGE_FOR) > coverage.out && rm coverage.tmp
 
 coverage: test ## show test coverage report
@@ -55,4 +59,4 @@ help: ## show this help screen
 # To avoid unintended conflicts with file names, always add to .PHONY
 # unless there is a reason not to.
 # https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html
-.PHONY: all deps tools lint test coverage fmt clean help
+.PHONY: all deps tools lint lint-all test coverage fmt clean help

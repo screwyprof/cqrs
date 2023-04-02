@@ -8,12 +8,13 @@ import (
 
 	"github.com/screwyprof/cqrs"
 	event "github.com/screwyprof/cqrs/aggregate/aggtest"
+	"github.com/screwyprof/cqrs/x"
 	"github.com/screwyprof/cqrs/x/eventhandler"
 	"github.com/screwyprof/cqrs/x/eventhandler/evnhndtest"
 )
 
 // ensure that event handler implements cqrs.EventHandler interface.
-var _ cqrs.EventHandler = (*eventhandler.EventHandler)(nil)
+var _ x.EventHandler = (*eventhandler.EventHandler)(nil)
 
 func TestNew(t *testing.T) {
 	t.Run("ItCreatesNewInstance", func(t *testing.T) {

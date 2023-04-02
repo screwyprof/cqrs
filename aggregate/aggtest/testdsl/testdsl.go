@@ -9,10 +9,10 @@ import (
 )
 
 // GivenFn is a test init function.
-type GivenFn func() (cqrs.AdvancedAggregate, []cqrs.DomainEvent)
+type GivenFn func() (cqrs.ESAggregate, []cqrs.DomainEvent)
 
 // WhenFn is a command handler function.
-type WhenFn func(agg cqrs.AdvancedAggregate, err error) ([]cqrs.DomainEvent, error)
+type WhenFn func(agg cqrs.ESAggregate, err error) ([]cqrs.DomainEvent, error)
 
 // ThenFn prepares the Checker.
 type ThenFn func(t *testing.T) Checker
@@ -32,26 +32,30 @@ type AggregateTester func(given GivenFn, when WhenFn, then ThenFn)
 //		  When(testdata.TestCommand{Param: "param"}),
 //		  Then(testdata.TestEvent{Data: "param"}),
 //	 )
-func Test(t *testing.T) AggregateTester {
+func Test(t *testing.T) AggregateTester { //nolint:tparallel,paralleltest
+	t.Helper()
+
 	return func(given GivenFn, when WhenFn, then ThenFn) {
 		t.Helper()
+
 		then(t)(when(applyEvents(given)))
 	}
 }
 
 // Given prepares the given aggregate for testing.
-func Given(agg cqrs.AdvancedAggregate, events ...cqrs.DomainEvent) GivenFn {
-	return func() (cqrs.AdvancedAggregate, []cqrs.DomainEvent) {
+func Given(agg cqrs.ESAggregate, events ...cqrs.DomainEvent) GivenFn {
+	return func() (cqrs.ESAggregate, []cqrs.DomainEvent) {
 		return agg, events
 	}
 }
 
 // When prepares the command handler for the given command.
 func When(c cqrs.Command) WhenFn {
-	return func(agg cqrs.AdvancedAggregate, err error) ([]cqrs.DomainEvent, error) {
+	return func(agg cqrs.ESAggregate, err error) ([]cqrs.DomainEvent, error) {
 		if err != nil {
 			return nil, err
 		}
+
 		return agg.Handle(c)
 	}
 }
@@ -59,8 +63,11 @@ func When(c cqrs.Command) WhenFn {
 // Then asserts that the expected events are applied.
 func Then(want ...cqrs.DomainEvent) ThenFn {
 	return func(t *testing.T) Checker {
+		t.Helper()
+
 		return func(got []cqrs.DomainEvent, err error) {
 			t.Helper()
+
 			assert.NoError(t, err)
 			assert.Equal(t, want, got)
 		}
@@ -70,17 +77,19 @@ func Then(want ...cqrs.DomainEvent) ThenFn {
 // ThenFailWith asserts that the expected error occurred.
 func ThenFailWith(want error) ThenFn {
 	return func(t *testing.T) Checker {
+		t.Helper()
+
 		return func(got []cqrs.DomainEvent, err error) {
 			t.Helper()
-			assert.Equal(t, want, err)
+
+			assert.ErrorIs(t, err, want)
 		}
 	}
 }
 
-func applyEvents(given GivenFn) (cqrs.AdvancedAggregate, error) {
+func applyEvents(given GivenFn) (cqrs.ESAggregate, error) {
 	agg, events := given()
-	err := agg.Apply(events...)
-	if err != nil {
+	if err := agg.Apply(events...); err != nil {
 		return nil, err
 	}
 

@@ -14,51 +14,51 @@ import (
 // ensure that factory implements cqrs.AggregateFactory interface.
 var _ cqrs.AggregateFactory = (*aggregate.Factory)(nil)
 
-func TestNewFactory(t *testing.T) {
-	t.Run("ItReturnsNewFactoryInstance", func(t *testing.T) {
-		f := aggregate.NewFactory()
-		assert.True(t, f != nil)
-	})
-}
+func TestFactory(t *testing.T) {
+	t.Parallel()
 
-func TestFactoryCreateAggregate(t *testing.T) {
-	t.Run("ItPanicsIfTheAggregateIsNotRegistered", func(t *testing.T) {
+	t.Run("it panics if an aggregate is not registered", func(t *testing.T) {
+		t.Parallel()
+
 		f := aggregate.NewFactory()
 
 		_, err := f.CreateAggregate(aggtest.TestAggregateType, aggtest.StringIdentifier(faker.UUIDHyphenated()))
 
-		assert.Equal(t, aggtest.ErrAggIsNotRegistered, err)
+		assert.ErrorIs(t, err, aggregate.ErrAggregateNotRegistered)
 	})
-}
 
-func TestFactoryRegisterAggregate(t *testing.T) {
-	t.Run("ItRegistersAnAggregateFactory", func(t *testing.T) {
+	t.Run("it creates an aggregate", func(t *testing.T) {
+		t.Parallel()
+
 		// arrange
-		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
-		agg := aggtest.NewTestAggregate(ID)
-
-		commandHandler := aggregate.NewCommandHandler()
-		commandHandler.RegisterHandlers(agg)
-
-		eventApplier := aggregate.NewEventApplier()
-		eventApplier.RegisterAppliers(agg)
-
-		expected := aggregate.NewAdvanced(
-			agg,
-			commandHandler,
-			eventApplier,
-		)
-
+		id := aggtest.StringIdentifier(faker.UUIDHyphenated())
 		f := aggregate.NewFactory()
 
 		// act
-		f.RegisterAggregate(func(ID cqrs.Identifier) cqrs.AdvancedAggregate {
-			return expected
+		f.RegisterAggregate(aggtest.TestAggregateType, func(ID cqrs.Identifier) cqrs.ESAggregate {
+			agg := aggtest.NewTestAggregate(id)
+
+			return aggregate.FromAggregate(agg)
 		})
-		newAgg, err := f.CreateAggregate(aggtest.TestAggregateType, ID)
+
+		agg, err := f.CreateAggregate(aggtest.TestAggregateType, id)
 
 		// assert
 		assert.NoError(t, err)
-		assert.Equal(t, expected, newAgg)
+		assert.Implements(t, (*cqrs.ESAggregate)(nil), agg)
+	})
+
+	t.Run("it converts a cqrs.Aggregate to a cqrs.ESAggregate", func(t *testing.T) {
+		t.Parallel()
+
+		// arrange
+		id := aggtest.StringIdentifier(faker.UUIDHyphenated())
+		agg := aggtest.NewTestAggregate(id)
+
+		// act
+		esAgg := aggregate.FromAggregate(agg)
+
+		// assert
+		assert.Implements(t, (*cqrs.ESAggregate)(nil), esAgg)
 	})
 }

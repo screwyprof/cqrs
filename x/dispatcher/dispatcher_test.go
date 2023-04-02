@@ -106,32 +106,32 @@ func createDispatcher(id cqrs.Identifier, opts ...option) *dispatcher.Dispatcher
 		opt(config)
 	}
 
-	pureAgg := aggtest.NewTestAggregate(id)
+	agg := aggtest.NewTestAggregate(id)
 
 	commandHandler := aggregate.NewCommandHandler()
-	commandHandler.RegisterHandlers(pureAgg)
+	commandHandler.RegisterHandlers(agg)
 
 	eventApplier := aggregate.NewEventApplier()
-	eventApplier.RegisterAppliers(pureAgg)
+	eventApplier.RegisterAppliers(agg)
 
-	agg := aggregate.NewAdvanced(pureAgg, commandHandler, eventApplier)
+	esAgg := aggregate.New(agg, commandHandler, eventApplier)
 	if config.loadedEvents != nil {
-		_ = agg.Apply(config.loadedEvents...)
+		_ = esAgg.Apply(config.loadedEvents...)
 	}
 
 	return dispatcher.NewDispatcher(
-		createAggregateStoreMock(agg, config.loadErr, config.storeErr),
+		createAggregateStoreMock(esAgg, config.loadErr, config.storeErr),
 	)
 }
 
 func createAggregateStoreMock(
-	want cqrs.AdvancedAggregate, loadErr error, storeErr error,
+	want cqrs.ESAggregate, loadErr error, storeErr error,
 ) *aggstoretest.AggregateStoreMock {
 	eventStore := &aggstoretest.AggregateStoreMock{
-		Loader: func(aggregateID cqrs.Identifier, aggregateType string) (cqrs.AdvancedAggregate, error) {
+		Loader: func(aggregateID cqrs.Identifier, aggregateType string) (cqrs.ESAggregate, error) {
 			return want, loadErr
 		},
-		Saver: func(aggregate cqrs.AdvancedAggregate, events ...cqrs.DomainEvent) error {
+		Saver: func(aggregate cqrs.ESAggregate, events ...cqrs.DomainEvent) error {
 			return storeErr
 		},
 	}

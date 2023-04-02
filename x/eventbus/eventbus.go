@@ -4,23 +4,24 @@ import (
 	"sync"
 
 	"github.com/screwyprof/cqrs"
+	"github.com/screwyprof/cqrs/x"
 )
 
 // InMemoryEventBus publishes events.
 type InMemoryEventBus struct {
-	eventHandlers   map[cqrs.EventHandler]struct{}
+	eventHandlers   map[x.EventHandler]struct{}
 	eventHandlersMu sync.RWMutex
 }
 
 // NewInMemoryEventBus creates a new instance of InMemoryEventBus.
 func NewInMemoryEventBus() *InMemoryEventBus {
 	return &InMemoryEventBus{
-		eventHandlers: make(map[cqrs.EventHandler]struct{}),
+		eventHandlers: make(map[x.EventHandler]struct{}),
 	}
 }
 
 // Register registers event handler.
-func (b *InMemoryEventBus) Register(h cqrs.EventHandler) {
+func (b *InMemoryEventBus) Register(h x.EventHandler) {
 	b.eventHandlersMu.Lock()
 	defer b.eventHandlersMu.Unlock()
 
@@ -41,7 +42,7 @@ func (b *InMemoryEventBus) Publish(events ...cqrs.DomainEvent) error {
 	return nil
 }
 
-func (b *InMemoryEventBus) handleEvents(h cqrs.EventHandler, events ...cqrs.DomainEvent) error {
+func (b *InMemoryEventBus) handleEvents(h x.EventHandler, events ...cqrs.DomainEvent) error {
 	for _, e := range events {
 		err := b.handleEventIfMatches(h.SubscribedTo(), h, e)
 		if err != nil {
@@ -51,7 +52,7 @@ func (b *InMemoryEventBus) handleEvents(h cqrs.EventHandler, events ...cqrs.Doma
 	return nil
 }
 
-func (b *InMemoryEventBus) handleEventIfMatches(m cqrs.EventMatcher, h cqrs.EventHandler, e cqrs.DomainEvent) error {
+func (b *InMemoryEventBus) handleEventIfMatches(m cqrs.EventMatcher, h x.EventHandler, e cqrs.DomainEvent) error {
 	if !m(e) {
 		return nil
 	}

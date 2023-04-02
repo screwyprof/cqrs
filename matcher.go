@@ -30,5 +30,6 @@ func matchAnyEvent(e DomainEvent, types ...string) bool {
 			return true
 		}
 	}
+
 	return false
 }
