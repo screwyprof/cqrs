@@ -89,7 +89,7 @@ func TestConsolePrinter_PrintAccountStatement(t *testing.T) {
 		// arrange
 		ID := aggtest.StringIdentifier(faker.UUIDHyphenated())
 
-		want := fmt.Errorf("some error occured")
+		want := fmt.Errorf("some error occurred")
 
 		var account *report.Account
 		accountReporter := &accountReporterMock{}
