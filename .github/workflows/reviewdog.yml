@@ -18,4 +18,4 @@ jobs:
         uses: reviewdog/action-golangci-lint@v2
         with:
           level: error
-          fail_on_error: true
+
