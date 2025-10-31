@@ -1,7 +1,7 @@
 # cqrs
 
 [![Build Status](https://github.com/screwyprof/cqrs/actions/workflows/test.yml/badge.svg)](https://github.com/screwyprof/cqrs/actions/workflows/test.yml)
-[![Maintainability](https://api.codeclimate.com/v1/badges/cfd6595574228033fd95/maintainability)](https://codeclimate.com/github/screwyprof/cqrs/maintainability)
+[![Maintainability](https://qlty.sh/gh/screwyprof/projects/cqrs/maintainability.svg)](https://qlty.sh/gh/screwyprof/projects/cqrs)
 [![Codecov](https://codecov.io/gh/screwyprof/cqrs/branch/master/graph/badge.svg)](https://codecov.io/gh/screwyprof/cqrs)
 [![Go Report Card](https://goreportcard.com/badge/github.com/screwyprof/payment)](https://goreportcard.com/report/github.com/screwyprof/cqrs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
