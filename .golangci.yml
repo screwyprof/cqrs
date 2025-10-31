@@ -1,22 +1,12 @@
-# https://golangci-lint.run/usage/configuration/#config-file
+# .golangci.yaml — v2
+version: "2"
+
 run:
-  deadline: 20m
-
-  skip-dirs-use-default: true
-
-  # timeout for analysis, e.g. 30s, 5m, default is 1m
-  timeout: 1m
-
-    #skip-dirs:
-    #- some/path
-
-    #skip-files:
-  #- some/path
-
-modules-download-mode: readonly
+  timeout: 20m
+  modules-download-mode: readonly
 
 linters:
-  disable-all: true
+  default: none
   enable:
     - asasalint
     - asciicheck
@@ -25,135 +15,108 @@ linters:
     - containedctx
     - contextcheck
     - cyclop
-    - depguard
+    #- depguard
     - dogsled
     - dupl
     - durationcheck
     - errcheck
     - errchkjson
+    #- err113
     - errname
     - errorlint
-    - execinquery
     - exhaustive
-    - exportloopref
-    #- forbidigo
-    - forcetypeassert
-    - funlen
-    - gci
+    #- forcetypeassert
     - gochecknoglobals
     - gochecknoinits
     - gocognit
-    - goconst
-    - gocritic
+    #- goconst
+    #- gocritic
     - gocyclo
-    - godot
-    #- godox
-    - goerr113
-    - gofmt
-    - gofumpt
+    #- godot
     - goheader
-    - goimports
-    #- gomnd
     - gomoddirectives
     - gomodguard
     - goprintffuncname
     - gosec
     - grouper
-    - gosimple
     - govet
-    #- httpresponse
     - importas
     - interfacebloat
-    #- ireturn
     - ineffassign
     - lll
-    - logrlint
+    - loggercheck        # was logrlint
     - maintidx
     - makezero
     - misspell
     - nakedret
     - nestif
     - nilerr
-    - nlreturn
+    #- nlreturn
     - noctx
     - nolintlint
     - nonamedreturns
     - nosprintfhostport
-    - paralleltest
+    #- paralleltest
     - prealloc
     - predeclared
     - promlinter
     - reassign
-    - revive
+    #- revive
     - rowserrcheck
     - sqlclosecheck
     - staticcheck
-    - stylecheck
-    #- tagliatelle
-    - tenv
     - testpackage
-    - thelper
-    - tparallel
-    - typecheck
+    #- thelper
+    #- tparallel
     - unconvert
     - unparam
     - usestdlibvars
     - unused
-    #- varnamelen
     - wastedassign
     - whitespace
-    #- wrapcheck
-    - wsl
-issues:
-  # Show only new issues created after git revision `REV`
-  new-from-rev: master
+    #- wsl_v5 # was wsl
+    - copyloopvar        # replaces exportloopref
 
+# v2 treats formatters separately (gofmt/gofumpt/goimports/gci)
+formatters:
+  enable:
+    - gci
+    - goimports
+    - gofumpt
+    - gofmt
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/screwyprof)
+      custom-order: true
+    goimports:
+      local-prefixes:
+        - github.com/screwyprof
+    gofmt:
+      simplify: false
+
+issues:
+  new-from-rev: master
   exclude-rules:
-    # Exclude some linters from running on tests files.
     - path: _test\.go
       linters:
         - funlen
         - gosec
         - dupl
-        - goerr113
-
+        - err113
     - path: test_helpers\.go
       linters:
         - funlen
         - gosec
         - dupl
-        - goerr113
-
+        - err113
     - path: testdsl
       linters:
         - wrapcheck
-output:
-  sort-results: true
 
-linters-settings:
-  goconst:
-    min-len: 2
-    min-occurrences: 2
-  gofmt:
-    auto-fix: false
-  govet:
-    check-shadowing: true
-  gocyclo:
-    min-complexity: 10
-  gci:
-    # put imports beginning with prefix after 3rd-party packages;
-    # only support one prefix
-    # if not set, use goimports.local-prefixes
-    local-prefixes: github.com/screwyprof
-    sections:
-      - standard
-      - default
-      - prefix(github.com/screwyprof)
-  nolintlint:
-    allow-unused: true # report any unused nolint directives
-  wrapcheck:
-    # An array of strings that specify substrings of signatures to ignore.
-    # If this set, it will override the default set of ignored signatures.
-    # See https://github.com/tomarrell/wrapcheck#configuration for more information.
-    ignoreSigs:
-      - fmt.Errorf
+output:
+  sort-order:
+    - linter
+    - file

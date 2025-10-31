@@ -19,6 +19,7 @@ all: tools lint test ## install tools, lint and test
 deps: ## install dependencies
 	@echo -e "$(OK_COLOR)--> Downloading go.mod dependencies$(NO_COLOR)"
 	@go mod download
+	@go mod tidy
 
 tools: ## install dev tools, linters, code generators, etc..
 	@echo -e "$(OK_COLOR)--> Installing tools from tools/tools.go$(NO_COLOR)"
